@@ -1,0 +1,58 @@
+name: Backend Integration Test
+
+on:
+  workflow_call:
+    inputs:
+      service:
+        required: true
+        type: string
+
+jobs:
+  integration:
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-java21jdk
+      volumes:
+        - /opt/gha-cache/m2:/root/.m2
+    env:
+      SPRING_PROFILES_ACTIVE: test
+      SPRING_COMPOSE_ENABLED: false
+      POSTGRES_HOST: task-service-test-db
+    services:
+      task-service-test-db:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: "myuser"
+          POSTGRES_PASSWORD: "secret"
+          POSTGRES_DB: "task"
+        options: >- 
+          --health-cmd pg_isready
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Clean
+        working-directory: ${{ inputs.service }}
+        run: |
+          ./mvnw clean
+
+      - name: Integration tests
+        working-directory: ${{ inputs.service }}
+        run: |
+          ./mvnw -B -ntp -e verify
+
+      - name: Integration test report
+        uses: mikepenz/action-junit-report@v6
+        if: always()
+        with:
+          report_paths: ${{ inputs.service }}/target/failsafe-reports/*.xml
+          check_name: Integration Tests
+
+      - name: Generate JaCoCo Badge
+        id: jacoco
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          jacoco-csv-file: ${{ inputs.service }}/target/site/jacoco/jacoco.csv
