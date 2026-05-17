@@ -3,6 +3,7 @@ package com.example.task_service.infrastructure.http;
 import com.example.task_service.application.CreateTaskUseCase;
 import com.example.task_service.domain.Task;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,6 @@ public class TaskController {
 
         this.createTaskUseCase.execute(task);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

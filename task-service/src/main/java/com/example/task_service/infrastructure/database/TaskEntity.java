@@ -2,6 +2,7 @@ package com.example.task_service.infrastructure.database;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "tasks")
+@Getter
 @Setter
 public class TaskEntity {
     @Id
