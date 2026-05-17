@@ -29,4 +29,6 @@ jobs:
     uses: ./.github/workflows/backend.yml
     with:
       service: "task-service"
+    permissions:
+      checks: write
 
