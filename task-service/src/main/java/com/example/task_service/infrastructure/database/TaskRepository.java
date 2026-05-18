@@ -5,6 +5,8 @@ import com.example.task_service.domain.Task;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class TaskRepository implements RepositoryPort {
@@ -14,6 +16,11 @@ public class TaskRepository implements RepositoryPort {
     public void save(Task task) {
         TaskEntity entity = TaskMapper.fromDomain(task);
         this.jpaTaskRepository.save(entity);
+    }
+
+    @Override
+    public List<Task> findAll() {
+        return jpaTaskRepository.findAll().stream().map(TaskMapper::fromEntity).toList();
     }
 
 }

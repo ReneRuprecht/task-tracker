@@ -49,5 +49,42 @@ public class TaskRepositoryIT {
         assertEquals(id.toString(), entity.getId().toString());
     }
 
+    @Test
+    void shouldListTasks() {
+
+        Task task1 = new Task(
+                TaskID.newTaskID(),
+                TaskName.newTaskName("feature"),
+                TaskStatus.newTaskStatus()
+        );
+        Task task2 = new Task(
+                TaskID.newTaskID(), TaskName.newTaskName("refactor"), TaskStatus.fromStatus(
+                TaskStatus.Status.CLOSED)
+        );
+
+        underTest.save(task1);
+        underTest.save(task2);
+
+        List<Task> tasks = underTest.findAll();
+
+        assertFalse(tasks.isEmpty());
+
+        Task firstTask = tasks.getFirst();
+        assertEquals(task1.getId().toString(), firstTask.getId().toString());
+        assertEquals("feature", firstTask.getName().toString());
+        assertEquals(
+                "OPEN",
+                firstTask.getStatus().value().toString()
+        );
+
+        Task secondTask = tasks.get(1);
+        assertEquals(task2.getId().toString(), secondTask.getId().toString());
+        assertEquals("refactor", secondTask.getName().toString());
+        assertEquals(
+                "CLOSED",
+                secondTask.getStatus().value().toString()
+        );
+    }
+
 
 }

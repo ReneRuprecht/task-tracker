@@ -5,6 +5,8 @@ import com.example.task_service.domain.TaskID;
 import com.example.task_service.domain.TaskName;
 import com.example.task_service.domain.TaskStatus;
 
+import java.util.List;
+
 public class TaskMapper {
 
     public static Task fromRequest(CreateTaskRequest createTaskRequest) {
@@ -15,5 +17,24 @@ public class TaskMapper {
         TaskStatus status = TaskStatus.newTaskStatus();
 
         return new Task(id, name, status);
+    }
+
+    public static ListTasksResponse toListTasksResponse(List<Task> tasks) {
+
+        List<TaskResponse> taskResponses = tasks
+                .stream()
+                .map(TaskMapper::toTaskResponse)
+                .toList();
+
+        return new ListTasksResponse(taskResponses);
+    }
+
+    private static TaskResponse toTaskResponse(Task task) {
+        return new TaskResponse(
+                task.getId().toString(),
+                task.getName().toString(),
+                task.getStatus().value().toString()
+        );
+
     }
 }
