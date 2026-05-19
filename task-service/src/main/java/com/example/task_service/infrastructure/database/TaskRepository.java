@@ -3,11 +3,11 @@ package com.example.task_service.infrastructure.database;
 import com.example.task_service.domain.RepositoryPort;
 import com.example.task_service.domain.Task;
 import com.example.task_service.domain.TaskID;
-import com.example.task_service.domain.exception.TaskNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -27,13 +27,10 @@ public class TaskRepository implements RepositoryPort {
     }
 
     @Override
-    public Task findByID(TaskID id) {
+    public Optional<Task> findByID(TaskID id) {
         UUID uuidID = UUID.fromString(id.toString());
-        TaskEntity entity = jpaTaskRepository
-                .findById(uuidID)
-                .orElseThrow(TaskNotFoundException::new);
+        return jpaTaskRepository.findById(uuidID).map(TaskMapper::fromEntity);
 
-        return TaskMapper.fromEntity(entity);
     }
 
 }

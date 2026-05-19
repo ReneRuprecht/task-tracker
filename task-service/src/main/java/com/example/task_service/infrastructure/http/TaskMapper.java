@@ -1,5 +1,6 @@
 package com.example.task_service.infrastructure.http;
 
+import com.example.task_service.application.PatchTask;
 import com.example.task_service.domain.Task;
 import com.example.task_service.domain.TaskID;
 import com.example.task_service.domain.TaskName;
@@ -21,10 +22,7 @@ public class TaskMapper {
 
     public static ListTasksResponse toListTasksResponse(List<Task> tasks) {
 
-        List<TaskResponse> taskResponses = tasks
-                .stream()
-                .map(TaskMapper::toTaskResponse)
-                .toList();
+        List<TaskResponse> taskResponses = tasks.stream().map(TaskMapper::toTaskResponse).toList();
 
         return new ListTasksResponse(taskResponses);
     }
@@ -48,6 +46,14 @@ public class TaskMapper {
 
     public static TaskID toTaskID(String id) {
         return TaskID.fromString(id);
+    }
+
+    public static PatchTask toPatchTask(String id, PatchTaskRequest patchTaskRequest) {
+        return new PatchTask(
+                id,
+                patchTaskRequest.name().orElse(""),
+                patchTaskRequest.status().orElse("")
+        );
     }
 
 }

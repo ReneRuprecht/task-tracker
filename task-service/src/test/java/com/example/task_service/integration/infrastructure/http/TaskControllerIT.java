@@ -3,6 +3,7 @@ package com.example.task_service.integration.infrastructure.http;
 import com.example.task_service.application.CreateTaskUseCase;
 import com.example.task_service.application.FindTaskByIDUseCase;
 import com.example.task_service.application.ListTasksUseCase;
+import com.example.task_service.application.PatchTaskUseCase;
 import com.example.task_service.domain.Task;
 import com.example.task_service.domain.TaskID;
 import com.example.task_service.domain.TaskName;
@@ -21,8 +22,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,32 +43,29 @@ public class TaskControllerIT {
     @MockitoBean
     FindTaskByIDUseCase findTaskByIDUseCase;
 
+    @MockitoBean
+    PatchTaskUseCase patchTaskUseCase;
+
     @Test
     void shouldCreateTaskWithStatusCreated() throws Exception {
 
 
-        mockMvc.perform(post("/api/v1/tasks")
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content("""
-                                   {
-                                     "name": "My Task"
-                                   }
-                               """))
-               .andExpect(status().isCreated());
+        mockMvc.perform(post("/api/v1/tasks").contentType(MediaType.APPLICATION_JSON).content("""
+                    {
+                      "name": "My Task"
+                    }
+                """)).andExpect(status().isCreated());
     }
 
     @Test
     void shouldReturnStatus400WithBadRequestData() throws Exception {
 
 
-        mockMvc.perform(post("/api/v1/tasks")
-                       .contentType(MediaType.APPLICATION_JSON)
-                       .content("""
-                                   {
-                                     "name": ""
-                                   }
-                               """))
-               .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/v1/tasks").contentType(MediaType.APPLICATION_JSON).content("""
+                    {
+                      "name": ""
+                    }
+                """)).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -87,11 +84,12 @@ public class TaskControllerIT {
 
         when(listTasksUseCase.execute()).thenReturn(List.of(task1, task2));
 
-        mockMvc.perform(get("/api/v1/tasks"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.tasks.length()").value(2))
-               .andExpect(jsonPath("$.tasks[0].name").value("feature"))
-               .andExpect(jsonPath("$.tasks[1].name").value("refactor"));
+        mockMvc
+                .perform(get("/api/v1/tasks"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tasks.length()").value(2))
+                .andExpect(jsonPath("$.tasks[0].name").value("feature"))
+                .andExpect(jsonPath("$.tasks[1].name").value("refactor"));
     }
 
     @Test
@@ -100,9 +98,10 @@ public class TaskControllerIT {
 
         when(listTasksUseCase.execute()).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/v1/tasks"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.tasks.length()").value(0));
+        mockMvc
+                .perform(get("/api/v1/tasks"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tasks.length()").value(0));
     }
 
     @Test
@@ -116,11 +115,12 @@ public class TaskControllerIT {
 
         when(findTaskByIDUseCase.execute(any())).thenReturn(task1);
 
-        mockMvc.perform(get(String.format("/api/v1/tasks/%s", task1.getId().toString())))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath(".id").value(task1.getId().toString()))
-               .andExpect(jsonPath(".name").value("feature"))
-               .andExpect(jsonPath(".status").value("OPEN"));
+        mockMvc
+                .perform(get(String.format("/api/v1/tasks/%s", task1.getId().toString())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(".id").value(task1.getId().toString()))
+                .andExpect(jsonPath(".name").value("feature"))
+                .andExpect(jsonPath(".status").value("OPEN"));
     }
 
     @Test
@@ -134,9 +134,31 @@ public class TaskControllerIT {
 
         when(findTaskByIDUseCase.execute(any())).thenThrow(TaskNotFoundException.class);
 
-        mockMvc.perform(get(String.format("/api/v1/tasks/%s", task1.getId().toString())))
-               .andExpect(status().isNotFound());
+        mockMvc
+                .perform(get(String.format("/api/v1/tasks/%s", task1.getId().toString())))
+                .andExpect(status().isNotFound());
     }
 
+
+    @Test
+    void shouldPatchTask() throws Exception {
+
+        Task task1 = new Task(
+                TaskID.newTaskID(),
+                TaskName.newTaskName("feature"),
+                TaskStatus.newTaskStatus()
+        );
+
+        mockMvc
+                .perform(patch(String.format("/api/v1/tasks/%s", task1.getId().toString()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                    {
+                                      "name": "refactor",
+                                      "status": "closed"
+                                    }
+                                """))
+                .andExpect(status().isOk());
+    }
 
 }

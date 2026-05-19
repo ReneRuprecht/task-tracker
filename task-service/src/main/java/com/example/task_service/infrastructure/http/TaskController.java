@@ -1,8 +1,6 @@
 package com.example.task_service.infrastructure.http;
 
-import com.example.task_service.application.CreateTaskUseCase;
-import com.example.task_service.application.FindTaskByIDUseCase;
-import com.example.task_service.application.ListTasksUseCase;
+import com.example.task_service.application.*;
 import com.example.task_service.domain.Task;
 import com.example.task_service.domain.TaskID;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +18,7 @@ public class TaskController {
     private final CreateTaskUseCase createTaskUseCase;
     private final ListTasksUseCase listTasksUseCase;
     private final FindTaskByIDUseCase findTaskByIDUseCase;
+    private final PatchTaskUseCase patchTaskUseCase;
 
     @PostMapping()
     public ResponseEntity<Void> createTask(@RequestBody CreateTaskRequest createTaskRequest) {
@@ -51,5 +50,16 @@ public class TaskController {
         FindTaskResponse response = TaskMapper.toFindTaskResponse(task);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("{id}")
+    public ResponseEntity<FindTaskResponse> patchTask(@PathVariable String id,
+                                                      @RequestBody PatchTaskRequest patchTaskRequest) {
+
+        PatchTask patchTask = TaskMapper.toPatchTask(id, patchTaskRequest);
+        this.patchTaskUseCase.execute(patchTask);
+
+
+        return ResponseEntity.ok().build();
     }
 }

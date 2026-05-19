@@ -1,5 +1,7 @@
 package com.example.task_service.domain;
 
+import com.example.task_service.domain.exception.InvalidTaskStatusException;
+
 public class TaskStatus {
 
     private Status taskStatus;
@@ -14,6 +16,14 @@ public class TaskStatus {
 
     public static TaskStatus fromStatus(Status status) {
         return new TaskStatus(status);
+    }
+
+    public static TaskStatus fromString(String status) {
+        return switch (status.toLowerCase()) {
+            case "open" -> new TaskStatus(Status.OPEN);
+            case "closed" -> new TaskStatus(Status.CLOSED);
+            default -> throw new InvalidTaskStatusException();
+        };
     }
 
     public void close() {

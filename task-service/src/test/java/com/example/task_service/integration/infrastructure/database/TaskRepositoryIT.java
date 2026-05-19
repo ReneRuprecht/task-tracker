@@ -4,7 +4,6 @@ import com.example.task_service.domain.Task;
 import com.example.task_service.domain.TaskID;
 import com.example.task_service.domain.TaskName;
 import com.example.task_service.domain.TaskStatus;
-import com.example.task_service.domain.exception.TaskNotFoundException;
 import com.example.task_service.infrastructure.database.JPATaskRepository;
 import com.example.task_service.infrastructure.database.TaskEntity;
 import com.example.task_service.infrastructure.database.TaskRepository;
@@ -15,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,8 +58,9 @@ public class TaskRepositoryIT {
                 TaskStatus.newTaskStatus()
         );
         Task task2 = new Task(
-                TaskID.newTaskID(), TaskName.newTaskName("refactor"), TaskStatus.fromStatus(
-                TaskStatus.Status.CLOSED)
+                TaskID.newTaskID(),
+                TaskName.newTaskName("refactor"),
+                TaskStatus.fromStatus(TaskStatus.Status.CLOSED)
         );
 
         underTest.save(task1);
@@ -72,18 +73,12 @@ public class TaskRepositoryIT {
         Task firstTask = tasks.getFirst();
         assertEquals(task1.getId().toString(), firstTask.getId().toString());
         assertEquals("feature", firstTask.getName().toString());
-        assertEquals(
-                "OPEN",
-                firstTask.getStatus().value().toString()
-        );
+        assertEquals("OPEN", firstTask.getStatus().value().toString());
 
         Task secondTask = tasks.get(1);
         assertEquals(task2.getId().toString(), secondTask.getId().toString());
         assertEquals("refactor", secondTask.getName().toString());
-        assertEquals(
-                "CLOSED",
-                secondTask.getStatus().value().toString()
-        );
+        assertEquals("CLOSED", secondTask.getStatus().value().toString());
     }
 
     @Test
@@ -97,19 +92,18 @@ public class TaskRepositoryIT {
 
         underTest.save(task1);
 
-        Task task = underTest.findByID(task1.getId());
+        Optional<Task> task = underTest.findByID(task1.getId());
 
-        assertEquals(task1.getId().toString(), task.getId().toString());
-        assertEquals("feature", task.getName().toString());
-        assertEquals(
-                "OPEN",
-                task.getStatus().value().toString()
-        );
+        assertTrue(task.isPresent());
+
+        assertEquals(task1.getId().toString(), task.get().getId().toString());
+        assertEquals("feature", task.get().getName().toString());
+        assertEquals("OPEN", task.get().getStatus().value().toString());
 
     }
 
     @Test
-    void shouldThrowTaskNotFoundIfFindTaskByIDIsEmpty() {
+    void shouldReturnEmptyOptionalIfFindTaskByIDIsEmpty() {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
@@ -117,11 +111,9 @@ public class TaskRepositoryIT {
                 TaskStatus.newTaskStatus()
         );
 
-        assertThrows(
-                TaskNotFoundException.class, () -> {
-                    underTest.findByID(task1.getId());
-                }
-        );
+        Optional<Task> task = underTest.findByID(task1.getId());
+
+        assertFalse(task.isPresent());
 
     }
 

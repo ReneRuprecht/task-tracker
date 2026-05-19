@@ -1,8 +1,7 @@
 package com.example.task_service.domain;
 
-import com.example.task_service.domain.exception.TaskNotFoundException;
-
 import java.util.List;
+import java.util.Optional;
 
 public interface RepositoryPort {
 
@@ -10,5 +9,5 @@ public interface RepositoryPort {
 
     List<Task> findAll();
 
-    Task findByID(TaskID id) throws TaskNotFoundException;
+    Optional<Task> findByID(TaskID id);
 }
