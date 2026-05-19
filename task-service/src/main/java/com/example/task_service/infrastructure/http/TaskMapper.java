@@ -37,4 +37,17 @@ public class TaskMapper {
         );
 
     }
+
+    public static FindTaskResponse toFindTaskResponse(Task task) {
+        return new FindTaskResponse(
+                task.getId().toString(),
+                task.getName().toString(),
+                task.getStatus().value().toString()
+        );
+    }
+
+    public static TaskID toTaskID(String id) {
+        return TaskID.fromString(id);
+    }
+
 }

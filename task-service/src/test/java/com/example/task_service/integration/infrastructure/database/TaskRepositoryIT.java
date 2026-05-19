@@ -4,6 +4,7 @@ import com.example.task_service.domain.Task;
 import com.example.task_service.domain.TaskID;
 import com.example.task_service.domain.TaskName;
 import com.example.task_service.domain.TaskStatus;
+import com.example.task_service.domain.exception.TaskNotFoundException;
 import com.example.task_service.infrastructure.database.JPATaskRepository;
 import com.example.task_service.infrastructure.database.TaskEntity;
 import com.example.task_service.infrastructure.database.TaskRepository;
@@ -15,8 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -84,6 +84,45 @@ public class TaskRepositoryIT {
                 "CLOSED",
                 secondTask.getStatus().value().toString()
         );
+    }
+
+    @Test
+    void shouldFindTaskByID() {
+
+        Task task1 = new Task(
+                TaskID.newTaskID(),
+                TaskName.newTaskName("feature"),
+                TaskStatus.newTaskStatus()
+        );
+
+        underTest.save(task1);
+
+        Task task = underTest.findByID(task1.getId());
+
+        assertEquals(task1.getId().toString(), task.getId().toString());
+        assertEquals("feature", task.getName().toString());
+        assertEquals(
+                "OPEN",
+                task.getStatus().value().toString()
+        );
+
+    }
+
+    @Test
+    void shouldThrowTaskNotFoundIfFindTaskByIDIsEmpty() {
+
+        Task task1 = new Task(
+                TaskID.newTaskID(),
+                TaskName.newTaskName("feature"),
+                TaskStatus.newTaskStatus()
+        );
+
+        assertThrows(
+                TaskNotFoundException.class, () -> {
+                    underTest.findByID(task1.getId());
+                }
+        );
+
     }
 
 

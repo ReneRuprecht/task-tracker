@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 
-public interface JPATaskRepository extends JpaRepository<TaskEntity,UUID> {
+public interface JPATaskRepository extends JpaRepository<TaskEntity, UUID> {
 }

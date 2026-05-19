@@ -1,11 +1,13 @@
 package com.example.task_service.integration.infrastructure.http;
 
 import com.example.task_service.application.CreateTaskUseCase;
+import com.example.task_service.application.FindTaskByIDUseCase;
 import com.example.task_service.application.ListTasksUseCase;
 import com.example.task_service.domain.Task;
 import com.example.task_service.domain.TaskID;
 import com.example.task_service.domain.TaskName;
 import com.example.task_service.domain.TaskStatus;
+import com.example.task_service.domain.exception.TaskNotFoundException;
 import com.example.task_service.infrastructure.http.TaskController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,6 +39,9 @@ public class TaskControllerIT {
 
     @MockitoBean
     ListTasksUseCase listTasksUseCase;
+
+    @MockitoBean
+    FindTaskByIDUseCase findTaskByIDUseCase;
 
     @Test
     void shouldCreateTaskWithStatusCreated() throws Exception {
@@ -97,6 +103,39 @@ public class TaskControllerIT {
         mockMvc.perform(get("/api/v1/tasks"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.tasks.length()").value(0));
+    }
+
+    @Test
+    void shouldFindTaskByID() throws Exception {
+
+        Task task1 = new Task(
+                TaskID.newTaskID(),
+                TaskName.newTaskName("feature"),
+                TaskStatus.newTaskStatus()
+        );
+
+        when(findTaskByIDUseCase.execute(any())).thenReturn(task1);
+
+        mockMvc.perform(get(String.format("/api/v1/tasks/%s", task1.getId().toString())))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath(".id").value(task1.getId().toString()))
+               .andExpect(jsonPath(".name").value("feature"))
+               .andExpect(jsonPath(".status").value("OPEN"));
+    }
+
+    @Test
+    void shouldReturnStatus404IfFindTaskByIDIsEmpty() throws Exception {
+
+        Task task1 = new Task(
+                TaskID.newTaskID(),
+                TaskName.newTaskName("feature"),
+                TaskStatus.newTaskStatus()
+        );
+
+        when(findTaskByIDUseCase.execute(any())).thenThrow(TaskNotFoundException.class);
+
+        mockMvc.perform(get(String.format("/api/v1/tasks/%s", task1.getId().toString())))
+               .andExpect(status().isNotFound());
     }
 
 
