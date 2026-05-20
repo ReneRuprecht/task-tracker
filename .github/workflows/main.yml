@@ -6,10 +6,15 @@ on:
       - main
 
 jobs:
-  task-service:
+  test-services:
+    strategy:
+      matrix:
+        service:
+          - task-service
+          - user-service
     uses: ./.github/workflows/backend.yml
     with:
-      service: "task-service"
+      service: ${{ matrix.service }}
     permissions:
       checks: write
 

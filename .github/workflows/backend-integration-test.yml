@@ -17,14 +17,16 @@ jobs:
     env:
       SPRING_PROFILES_ACTIVE: test
       SPRING_COMPOSE_ENABLED: false
-      POSTGRES_HOST: task-service-test-db
+      POSTGRES_HOST: "postgres_test"
+      POSTGRES_DB: "test"
+      POSTGRES_PORT: "5432"
     services:
-      task-service-test-db:
+      postgres_test:
         image: postgres:18-alpine
         env:
           POSTGRES_USER: "myuser"
           POSTGRES_PASSWORD: "secret"
-          POSTGRES_DB: "task"
+          POSTGRES_DB: "test"
         options: >- 
           --health-cmd pg_isready
           --health-interval 10s 
