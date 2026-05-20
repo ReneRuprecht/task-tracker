@@ -11,7 +11,7 @@ public class Username {
     }
 
     public static Username newUserName(String username){
-        if (username.isBlank()){
+        if (username == null || username.isBlank()){
             throw new InvalidUsernameException();
         }
         return new Username(username);

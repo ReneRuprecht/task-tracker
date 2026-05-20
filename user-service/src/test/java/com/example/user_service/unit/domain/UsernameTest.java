@@ -19,6 +19,16 @@ public class UsernameTest {
     }
 
     @Test
+    void shouldThrowInvalidUsernameExceptionIfUsernameIsNull() {
+        assertThrows(
+                InvalidUsernameException.class, () -> {
+                    Username.newUserName(null);
+                }
+        );
+
+    }
+
+    @Test
     void shouldThrowInvalidUsernameExceptionIfUsernameIsBlank() {
         String name = "";
 

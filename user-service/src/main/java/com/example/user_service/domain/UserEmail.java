@@ -11,7 +11,7 @@ public class UserEmail {
     }
 
     public static UserEmail newUserEmail(String userEmail) {
-        if (userEmail.isBlank()) {
+        if (userEmail == null || userEmail.isBlank()) {
             throw new InvalidUserEmailException("Email cannot be empty");
         }
 
@@ -22,11 +22,11 @@ public class UserEmail {
         return new UserEmail(userEmail);
     }
 
-    public String toString(){
-        return this.userEmail;
-    }
-
     private static boolean isValid(String email) {
         return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
+    }
+
+    public String toString() {
+        return this.userEmail;
     }
 }

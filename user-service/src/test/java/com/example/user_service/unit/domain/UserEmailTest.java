@@ -19,6 +19,18 @@ public class UserEmailTest {
     }
 
     @Test
+    void shouldThrowInvalidUserEmailExceptionIfEmailIsNull() {
+
+        Exception exception = assertThrows(
+                InvalidUserEmailException.class, () -> {
+                    UserEmail.newUserEmail(null);
+                }
+        );
+
+        assertEquals("Email cannot be empty", exception.getMessage());
+    }
+
+    @Test
     void shouldThrowInvalidUserEmailExceptionIfEmailIsEmpty() {
         String email = "";
 
@@ -31,6 +43,7 @@ public class UserEmailTest {
 
         assertEquals("Email cannot be empty", exception.getMessage());
     }
+
 
     @Test
     void shouldThrowInvalidUserEmailExceptionIfEmailIsInvalid() {

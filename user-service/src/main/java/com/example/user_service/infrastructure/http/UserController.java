@@ -1,7 +1,7 @@
 package com.example.user_service.infrastructure.http;
 
 import com.example.user_service.application.CreateUserUseCase;
-import com.example.user_service.domain.User;
+import com.example.user_service.application.command.CreateUserCommand;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,9 +21,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<Void> createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
 
-        User user = UserMapper.toUser(createUserRequest);
+        CreateUserCommand createUserCommand = UserMapper.toCreateUserCommand(createUserRequest);
 
-        this.createUserUseCase.execute(user);
+        this.createUserUseCase.execute(createUserCommand);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
