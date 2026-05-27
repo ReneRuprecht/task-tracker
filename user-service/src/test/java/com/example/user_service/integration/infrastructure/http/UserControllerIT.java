@@ -25,8 +25,8 @@ public class UserControllerIT {
 
         mockMvc.perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON).content("""
                     {
-                      "username": "user1",
-                      "email": "user1@test.de"
+                      "username": "user_valid",
+                      "email": "user_valid@test.de"
                     }
                 """)).andExpect(status().isCreated());
 
@@ -44,6 +44,48 @@ public class UserControllerIT {
                         """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid Request Data"));
+    }
+
+    @Test
+    void shouldNotCreateUserAndReturnUsernameAlreadyExistsAndStatusConflict() throws Exception {
+
+        mockMvc.perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON).content("""
+                    {
+                      "username": "user_exists",
+                      "email": "user_exists_1@test.de"
+                    }
+                """)).andExpect(status().isCreated());
+
+        mockMvc
+                .perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON).content("""
+                            {
+                              "username": "user_exists",
+                              "email": "user_exists_2@test.de"
+                            }
+                        """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Username already exists"));
+    }
+
+    @Test
+    void shouldNotCreateUserAndReturnUserEmailAlreadyExistsAndStatusConflict() throws Exception {
+
+        mockMvc.perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON).content("""
+                    {
+                      "username": "user_email_exists_1",
+                      "email": "user_email_exists_1@test.de"
+                    }
+                """)).andExpect(status().isCreated());
+
+        mockMvc
+                .perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON).content("""
+                            {
+                              "username": "user_email_exists_2",
+                              "email": "user_email_exists_1@test.de"
+                            }
+                        """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Email already exists"));
     }
 }
 

@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         service:
-          # - task-service
+          - task-service
           - user-service
     uses: ./.github/workflows/backend.yml
     with:

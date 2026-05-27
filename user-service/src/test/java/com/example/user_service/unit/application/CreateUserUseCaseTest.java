@@ -5,6 +5,7 @@ import com.example.user_service.application.PublishPort;
 import com.example.user_service.application.command.CreateUserCommand;
 import com.example.user_service.domain.RepositoryPort;
 import com.example.user_service.domain.User;
+import com.example.user_service.domain.event.UserCreatedEvent;
 import com.example.user_service.domain.exception.InvalidUserEmailException;
 import com.example.user_service.domain.exception.InvalidUsernameException;
 import org.junit.jupiter.api.Test;
@@ -42,10 +43,20 @@ public class CreateUserUseCaseTest {
 
         verify(repositoryPort).save(userCaptor.capture());
 
+        ArgumentCaptor<UserCreatedEvent> userCreatedEventCaptor = ArgumentCaptor.forClass(
+                UserCreatedEvent.class);
+
+        verify(publishPort).publish(userCreatedEventCaptor.capture());
+
         User savedUser = userCaptor.getValue();
+
+        UserCreatedEvent publishedUser = userCreatedEventCaptor.getValue();
 
         assertEquals("user1", savedUser.getUsername().toString());
         assertEquals("user1@test.de", savedUser.getUserEmail().toString());
+
+        assertEquals("user1", publishedUser.username().toString());
+        assertEquals("user1@test.de", publishedUser.userEmail().toString());
     }
 
     @Test
