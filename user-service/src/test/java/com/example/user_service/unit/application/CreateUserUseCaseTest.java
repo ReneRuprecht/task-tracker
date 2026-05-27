@@ -1,6 +1,7 @@
 package com.example.user_service.unit.application;
 
 import com.example.user_service.application.CreateUserUseCase;
+import com.example.user_service.application.PublishPort;
 import com.example.user_service.application.command.CreateUserCommand;
 import com.example.user_service.domain.RepositoryPort;
 import com.example.user_service.domain.User;
@@ -23,6 +24,9 @@ public class CreateUserUseCaseTest {
 
     @Mock
     RepositoryPort repositoryPort;
+
+    @Mock
+    PublishPort publishPort;
 
     @InjectMocks
     CreateUserUseCase underTest;
