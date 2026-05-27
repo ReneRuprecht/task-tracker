@@ -1,12 +1,12 @@
-import './App.css'
-import TaskBoardPage from './pages/TaskBoardPage'
+import "./App.css";
+import TaskBoardPage from "./pages/TaskBoardPage";
 
 function App() {
-    return (
-        <>
-            <TaskBoardPage />
-        </>
-    )
+  return (
+    <>
+      <TaskBoardPage />
+    </>
+  );
 }
 
-export default App
+export default App;
