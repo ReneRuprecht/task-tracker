@@ -1,11 +1,12 @@
 import './App.css'
+import TaskBoardPage from './pages/TaskBoardPage'
 
 function App() {
-  return (
-    <>
-        <h1>Tasks</h1>
-    </>
-  )
+    return (
+        <>
+            <TaskBoardPage />
+        </>
+    )
 }
 
 export default App
