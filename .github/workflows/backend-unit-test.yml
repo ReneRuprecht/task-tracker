@@ -15,11 +15,17 @@ jobs:
     runs-on: self-hosted
     container:
       image: reneruprecht/ci-java21jdk
-      volumes:
-        - /opt/gha-cache/m2:/root/.m2
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
+
+      - name: Cache Maven packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ inputs.service }}-${{ hashFiles(format('{0}/pom.xml', inputs.service)) }}
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ inputs.service }}
 
       - name: Unit tests
         working-directory: ${{ inputs.service }}
