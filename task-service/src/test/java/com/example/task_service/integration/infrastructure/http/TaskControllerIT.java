@@ -54,7 +54,9 @@ public class TaskControllerIT {
                     {
                       "name": "My Task"
                     }
-                """)).andExpect(status().isCreated());
+                """)).andExpect(status().isCreated())
+                .andExpect(jsonPath(".name").value("My Task"))
+                .andExpect(jsonPath(".status").value("OPEN"));
     }
 
     @Test

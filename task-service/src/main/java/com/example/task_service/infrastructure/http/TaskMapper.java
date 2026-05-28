@@ -56,4 +56,12 @@ public class TaskMapper {
         );
     }
 
+    public static CreateTaskResponse toCreateTaskResponse(Task task) {
+        return new CreateTaskResponse(
+                task.getId().toString(),
+                task.getName().toString(),
+                task.getStatus().value().toString()
+        );
+    }
+
 }

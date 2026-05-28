@@ -22,13 +22,15 @@ public class TaskController {
     private final PatchTaskUseCase patchTaskUseCase;
 
     @PostMapping()
-    public ResponseEntity<Void> createTask(@RequestBody CreateTaskRequest createTaskRequest) {
+    public ResponseEntity<CreateTaskResponse> createTask(@RequestBody CreateTaskRequest createTaskRequest) {
 
         Task task = TaskMapper.fromRequest(createTaskRequest);
 
         this.createTaskUseCase.execute(task);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        CreateTaskResponse createTaskResponse = TaskMapper.toCreateTaskResponse(task);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createTaskResponse);
     }
 
     @GetMapping()
