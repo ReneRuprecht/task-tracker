@@ -6,7 +6,7 @@ import { getClosedTasks, getOpenTasks } from "../utils/taskFilters";
 
 interface TaskColumnProps {
   tasks: Task[];
-  onTaskUpdate: (taskID: string, status: TaskStatus) => void;
+  onTaskUpdate: (taskID: string, title: string, status: TaskStatus) => void;
   onCreateTask: (title: string) => void;
 }
 

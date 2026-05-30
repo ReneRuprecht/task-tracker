@@ -1,7 +1,7 @@
 import type { Task, TaskStatus } from "../../../types/Task";
 import { cn } from "../../../utils/tailwind";
 import CreateTaskCard from "./CreateTaskCard";
-import TaskCard from "./TaskCard";
+import TaskCard from "./TaskCard/TaskCard";
 
 interface OpenTaskColumnProps {
   openTasks: Task[];
@@ -9,7 +9,7 @@ interface OpenTaskColumnProps {
   onOpenCreate: () => void;
   onCloseCreate: () => void;
   onCreateTask: (title: string) => void;
-  onTaskUpdate: (taskID: string, status: TaskStatus) => void;
+  onTaskUpdate: (taskID: string, title: string, status: TaskStatus) => void;
 }
 
 export default function OpenTaskColumn({

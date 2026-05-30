@@ -4,25 +4,30 @@ import { getTasks } from "../features/tasks/api/GetTasks";
 import TaskColumn from "../features/tasks/components/TaskColumn";
 import { ProgressBar } from "../components/ui/Progressbar";
 import { createTask } from "../features/tasks/api/CreateTask";
-import { updateTaskStatus } from "../features/tasks/api/UpdateTaskStatus";
+import { updateTask } from "../features/tasks/api/UpdateTask";
 
 export default function TaskBoardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const handleTaskUpdated = async (taskId: string, status: TaskStatus) => {
-    await updateTaskStatus(taskId, status);
+  const handleTaskUpdated = async (
+    taskId: string,
+    title: string,
+    status: TaskStatus,
+  ) => {
+    const updatedTask: Task = { id: taskId, name: title, status: status };
+
+    await updateTask(updatedTask);
 
     setTasks((prev) =>
-      prev.map((task) => (task.id === taskId ? { ...task, status } : task)),
+      prev.map((task) => (task.id === taskId ? updatedTask : task)),
     );
   };
 
   const handleCreateTask = async (title: string) => {
     const newTask = await createTask(title);
     setTasks([newTask, ...tasks]);
-    console.log("handle create ", title);
   };
 
   const closedTask = tasks.filter((task) => task.status === "CLOSED");
