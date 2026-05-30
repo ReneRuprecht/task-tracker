@@ -18,3 +18,8 @@ jobs:
     permissions:
       checks: write
 
+  test-frontend:
+    uses: ./.github/workflows/frontend.yml
+    permissions:
+      contents: read
+      pull-requests: write

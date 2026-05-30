@@ -1,0 +1,48 @@
+name: Frontend
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test:
+    runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-node24
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Cache npm
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: |
+          npm install
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: frontend
+        run: |
+          npm run coverage
+
+      - name: 'Report Coverage'
+        if: always() 
+        uses:  davelosert/vitest-coverage-report-action@v2
+        with:
+          working-directory: frontend
+          json-final-path: './coverage/coverage-final.json'
+          json-summary-path: './coverage/coverage-summary.json'
+          threshold-icons: "{0: '🔴', 80: '🟠', 90: '🟢'}"
