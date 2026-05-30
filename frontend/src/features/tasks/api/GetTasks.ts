@@ -1,4 +1,4 @@
-import type { Tasks } from "../types/Task";
+import type { Tasks } from "../../../types/Task";
 
 export async function getTasks(): Promise<Tasks> {
   const base_api_url = import.meta.env.VITE_API_BASE_URL;
