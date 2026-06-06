@@ -3,8 +3,8 @@ package com.example.task_service.task.infrastructure.http;
 import com.example.task_service.task.application.PatchTask;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskName;
 import com.example.task_service.task.domain.TaskStatus;
+import com.example.task_service.task.domain.TaskTitle;
 
 import java.util.List;
 
@@ -13,11 +13,11 @@ public class TaskMapper {
     public static Task fromRequest(CreateTaskRequest createTaskRequest) {
         TaskID id = TaskID.newTaskID();
 
-        TaskName name = TaskName.newTaskName(createTaskRequest.name());
+        TaskTitle title = TaskTitle.newTaskTitle(createTaskRequest.title());
 
         TaskStatus status = TaskStatus.newTaskStatus();
 
-        return new Task(id, name, status);
+        return new Task(id, title, status);
     }
 
     public static ListTasksResponse toListTasksResponse(List<Task> tasks) {
@@ -30,7 +30,7 @@ public class TaskMapper {
     private static TaskResponse toTaskResponse(Task task) {
         return new TaskResponse(
                 task.getId().toString(),
-                task.getName().toString(),
+                task.getTitle().toString(),
                 task.getStatus().value().toString()
         );
 
@@ -39,7 +39,7 @@ public class TaskMapper {
     public static FindTaskResponse toFindTaskResponse(Task task) {
         return new FindTaskResponse(
                 task.getId().toString(),
-                task.getName().toString(),
+                task.getTitle().toString(),
                 task.getStatus().value().toString()
         );
     }
@@ -51,7 +51,7 @@ public class TaskMapper {
     public static PatchTask toPatchTask(String id, PatchTaskRequest patchTaskRequest) {
         return new PatchTask(
                 id,
-                patchTaskRequest.name().orElse(""),
+                patchTaskRequest.title().orElse(""),
                 patchTaskRequest.status().orElse("")
         );
     }
@@ -59,7 +59,7 @@ public class TaskMapper {
     public static CreateTaskResponse toCreateTaskResponse(Task task) {
         return new CreateTaskResponse(
                 task.getId().toString(),
-                task.getName().toString(),
+                task.getTitle().toString(),
                 task.getStatus().value().toString()
         );
     }

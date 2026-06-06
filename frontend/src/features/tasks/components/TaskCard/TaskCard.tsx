@@ -17,19 +17,19 @@ export default function TaskCard({ task, onUpdated }: TaskCardProps) {
   const handleToggle = async () => {
     const newStatus: TaskStatus = toggleTaskStatus(task.status);
 
-    onUpdated(task.id, task.name, newStatus);
+    onUpdated(task.id, task.title, newStatus);
   };
   const taskCardWrapperStyle = getTaskCardWrapperStyle(task.status, hoverMode);
   const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(task.name);
+  const [title, setTitle] = useState(task.title);
 
   const startEdit = () => {
     setIsEditing(true);
-    setTitle(task.name);
+    setTitle(task.title);
   };
 
   const cancelEdit = () => {
-    setTitle(task.name);
+    setTitle(task.title);
     setIsEditing(false);
   };
 

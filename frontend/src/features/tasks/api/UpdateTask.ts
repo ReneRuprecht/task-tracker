@@ -7,7 +7,7 @@ export async function updateTask(task: Task): Promise<void> {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name: task.name, status: task.status }),
+    body: JSON.stringify({ title: task.title, status: task.status }),
   });
   if (!response.ok) throw new Error("Failed to fetch tasks");
 }

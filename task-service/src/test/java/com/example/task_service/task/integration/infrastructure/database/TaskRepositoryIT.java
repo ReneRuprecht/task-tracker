@@ -2,8 +2,8 @@ package com.example.task_service.task.integration.infrastructure.database;
 
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskName;
 import com.example.task_service.task.domain.TaskStatus;
+import com.example.task_service.task.domain.TaskTitle;
 import com.example.task_service.task.infrastructure.database.JPATaskRepository;
 import com.example.task_service.task.infrastructure.database.TaskEntity;
 import com.example.task_service.task.infrastructure.database.TaskRepository;
@@ -36,9 +36,9 @@ public class TaskRepositoryIT {
     void shouldSaveTask() {
 
         TaskID id = TaskID.newTaskID();
-        TaskName name = TaskName.newTaskName("test-task");
+        TaskTitle title = TaskTitle.newTaskTitle("test-task");
         TaskStatus status = TaskStatus.newTaskStatus();
-        Task task = new Task(id, name, status);
+        Task task = new Task(id, title, status);
 
         underTest.save(task);
 
@@ -54,12 +54,12 @@ public class TaskRepositoryIT {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
         Task task2 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("refactor"),
+                TaskTitle.newTaskTitle("refactor"),
                 TaskStatus.fromStatus(TaskStatus.Status.CLOSED)
         );
 
@@ -72,12 +72,12 @@ public class TaskRepositoryIT {
 
         Task firstTask = tasks.getFirst();
         assertEquals(task1.getId().toString(), firstTask.getId().toString());
-        assertEquals("feature", firstTask.getName().toString());
+        assertEquals("feature", firstTask.getTitle().toString());
         assertEquals("OPEN", firstTask.getStatus().value().toString());
 
         Task secondTask = tasks.get(1);
         assertEquals(task2.getId().toString(), secondTask.getId().toString());
-        assertEquals("refactor", secondTask.getName().toString());
+        assertEquals("refactor", secondTask.getTitle().toString());
         assertEquals("CLOSED", secondTask.getStatus().value().toString());
     }
 
@@ -86,7 +86,7 @@ public class TaskRepositoryIT {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
 
@@ -97,7 +97,7 @@ public class TaskRepositoryIT {
         assertTrue(task.isPresent());
 
         assertEquals(task1.getId().toString(), task.get().getId().toString());
-        assertEquals("feature", task.get().getName().toString());
+        assertEquals("feature", task.get().getTitle().toString());
         assertEquals("OPEN", task.get().getStatus().value().toString());
 
     }
@@ -107,7 +107,7 @@ public class TaskRepositoryIT {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
 

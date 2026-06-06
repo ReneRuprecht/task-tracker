@@ -17,7 +17,7 @@ import java.util.UUID;
 public class TaskEntity {
     @Id
     private UUID id;
-    private String name;
+    private String title;
     @Enumerated(EnumType.STRING)
     private Status status;
     public enum Status {

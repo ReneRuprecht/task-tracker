@@ -16,7 +16,7 @@ export default function TaskBoardPage() {
     title: string,
     status: TaskStatus,
   ) => {
-    const updatedTask: Task = { id: taskId, name: title, status: status };
+    const updatedTask: Task = { id: taskId, title: title, status: status };
 
     await updateTask(updatedTask);
 

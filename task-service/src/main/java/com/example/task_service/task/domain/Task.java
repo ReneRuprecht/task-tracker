@@ -14,7 +14,7 @@ public class Task {
 
     @Getter
     @Setter
-    private TaskName name;
+    private TaskTitle title;
 
     @Getter
     @Setter

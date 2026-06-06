@@ -5,13 +5,13 @@ import userEvent from "@testing-library/user-event";
 import type { Task } from "../../../../types/Task";
 
 describe("TaskCard", () => {
-  const openTask: Task = { id: "1", name: "refactor tests", status: "OPEN" };
+  const openTask: Task = { id: "1", title: "refactor tests", status: "OPEN" };
   const closedTask: Task = {
     id: "2",
-    name: "create test pipelines",
+    title: "create test pipelines",
     status: "CLOSED",
   };
-  it("renders the task name", () => {
+  it("renders the task title", () => {
     render(<TaskCard task={openTask} onUpdated={vi.fn()} />);
 
     expect(screen.getByText("refactor tests")).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe("TaskCard", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: "refactor tests",
+        title: "refactor tests",
       }),
     );
 
@@ -38,7 +38,7 @@ describe("TaskCard", () => {
 
     await user.click(
       screen.getByRole("button", {
-        name: "create test pipelines",
+        title: "create test pipelines",
       }),
     );
 
@@ -54,7 +54,7 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", name: "refactor tests", status: "OPEN" }}
+        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
         onUpdated={vi.fn()}
       />,
     );
@@ -69,7 +69,7 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", name: "refactor tests", status: "OPEN" }}
+        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
         onUpdated={onUpdated}
       />,
     );
@@ -86,7 +86,7 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", name: "refactor tests", status: "OPEN" }}
+        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
         onUpdated={onUpdated}
       />,
     );
@@ -106,7 +106,7 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", name: "refactor tests", status: "OPEN" }}
+        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
         onUpdated={vi.fn()}
       />,
     );
@@ -125,7 +125,7 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", name: "refactor tests", status: "OPEN" }}
+        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
         onUpdated={vi.fn()}
       />,
     );

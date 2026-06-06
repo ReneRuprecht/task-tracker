@@ -1,4 +1,4 @@
 package com.example.task_service.task.infrastructure.http;
 
-public record FindTaskResponse(String id, String name, String status) {
+public record FindTaskResponse(String id, String title, String status) {
 }

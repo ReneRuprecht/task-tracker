@@ -3,7 +3,7 @@ package com.example.task_service.task.unit.application;
 import com.example.task_service.task.application.CreateTaskUseCase;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskName;
+import com.example.task_service.task.domain.TaskTitle;
 import com.example.task_service.task.domain.TaskStatus;
 import com.example.task_service.task.infrastructure.database.TaskRepository;
 import org.junit.jupiter.api.Test;
@@ -27,9 +27,9 @@ public class CreateTaskUseCaseTest {
     @Test
     void shouldExecute() {
         TaskID id = TaskID.newTaskID();
-        TaskName name = TaskName.newTaskName("test-task");
+        TaskTitle title = TaskTitle.newTaskTitle("test-task");
         TaskStatus status = TaskStatus.newTaskStatus();
-        Task task = new Task(id, name, status);
+        Task task = new Task(id, title, status);
 
         underTest.execute(task);
 

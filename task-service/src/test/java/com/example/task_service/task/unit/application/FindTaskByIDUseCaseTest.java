@@ -3,7 +3,7 @@ package com.example.task_service.task.unit.application;
 import com.example.task_service.task.application.FindTaskByIDUseCase;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskName;
+import com.example.task_service.task.domain.TaskTitle;
 import com.example.task_service.task.domain.TaskStatus;
 import com.example.task_service.task.infrastructure.database.TaskRepository;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class FindTaskByIDUseCaseTest {
     void shouldExecute() {
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
 

@@ -6,7 +6,7 @@ import com.example.task_service.task.application.ListTasksUseCase;
 import com.example.task_service.task.application.PatchTaskUseCase;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskName;
+import com.example.task_service.task.domain.TaskTitle;
 import com.example.task_service.task.domain.TaskStatus;
 import com.example.task_service.task.domain.exception.TaskNotFoundException;
 import com.example.task_service.task.infrastructure.http.TaskController;
@@ -52,10 +52,10 @@ public class TaskControllerIT {
 
         mockMvc.perform(post("/api/v1/tasks").contentType(MediaType.APPLICATION_JSON).content("""
                     {
-                      "name": "My Task"
+                      "title": "My Task"
                     }
                 """)).andExpect(status().isCreated())
-                .andExpect(jsonPath(".name").value("My Task"))
+                .andExpect(jsonPath(".title").value("My Task"))
                 .andExpect(jsonPath(".status").value("OPEN"));
     }
 
@@ -65,7 +65,7 @@ public class TaskControllerIT {
 
         mockMvc.perform(post("/api/v1/tasks").contentType(MediaType.APPLICATION_JSON).content("""
                     {
-                      "name": ""
+                      "title": ""
                     }
                 """)).andExpect(status().isBadRequest());
     }
@@ -75,12 +75,12 @@ public class TaskControllerIT {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
         Task task2 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("refactor"),
+                TaskTitle.newTaskTitle("refactor"),
                 TaskStatus.newTaskStatus()
         );
 
@@ -90,8 +90,8 @@ public class TaskControllerIT {
                 .perform(get("/api/v1/tasks"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tasks.length()").value(2))
-                .andExpect(jsonPath("$.tasks[0].name").value("feature"))
-                .andExpect(jsonPath("$.tasks[1].name").value("refactor"));
+                .andExpect(jsonPath("$.tasks[0].title").value("feature"))
+                .andExpect(jsonPath("$.tasks[1].title").value("refactor"));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class TaskControllerIT {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
 
@@ -121,7 +121,7 @@ public class TaskControllerIT {
                 .perform(get(String.format("/api/v1/tasks/%s", task1.getId().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(".id").value(task1.getId().toString()))
-                .andExpect(jsonPath(".name").value("feature"))
+                .andExpect(jsonPath(".title").value("feature"))
                 .andExpect(jsonPath(".status").value("OPEN"));
     }
 
@@ -130,7 +130,7 @@ public class TaskControllerIT {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
 
@@ -147,7 +147,7 @@ public class TaskControllerIT {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
 
@@ -156,7 +156,7 @@ public class TaskControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                     {
-                                      "name": "refactor",
+                                      "title": "refactor",
                                       "status": "closed"
                                     }
                                 """))

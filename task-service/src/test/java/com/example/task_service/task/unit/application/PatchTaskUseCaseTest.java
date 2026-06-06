@@ -4,7 +4,7 @@ import com.example.task_service.task.application.PatchTask;
 import com.example.task_service.task.application.PatchTaskUseCase;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskName;
+import com.example.task_service.task.domain.TaskTitle;
 import com.example.task_service.task.domain.TaskStatus;
 import com.example.task_service.task.domain.exception.TaskNotFoundException;
 import com.example.task_service.task.infrastructure.database.TaskRepository;
@@ -37,7 +37,7 @@ public class PatchTaskUseCaseTest {
     void shouldExecuteWithAllPatchTaskFields() {
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
         PatchTask patchTask = new PatchTask(task1.getId().toString(), "refactor", "closed");
@@ -53,7 +53,7 @@ public class PatchTaskUseCaseTest {
 
         Task savedTask = taskCaptor.getValue();
 
-        assertEquals("refactor", savedTask.getName().toString());
+        assertEquals("refactor", savedTask.getTitle().toString());
         assertEquals("CLOSED", savedTask.getStatus().value().toString());
     }
 
@@ -61,7 +61,7 @@ public class PatchTaskUseCaseTest {
     void shouldExecuteWithEmptyPatchTaskFields() {
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
         PatchTask patchTask = new PatchTask(task1.getId().toString(), "", "");
@@ -77,7 +77,7 @@ public class PatchTaskUseCaseTest {
 
         Task savedTask = taskCaptor.getValue();
 
-        assertEquals("feature", savedTask.getName().toString());
+        assertEquals("feature", savedTask.getTitle().toString());
         assertEquals("OPEN", savedTask.getStatus().value().toString());
     }
 
@@ -86,7 +86,7 @@ public class PatchTaskUseCaseTest {
 
         Task task1 = new Task(
                 TaskID.newTaskID(),
-                TaskName.newTaskName("feature"),
+                TaskTitle.newTaskTitle("feature"),
                 TaskStatus.newTaskStatus()
         );
         PatchTask patchTask = new PatchTask(task1.getId().toString(), "refactor", "closed");

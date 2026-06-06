@@ -1,4 +1,4 @@
 package com.example.task_service.task.application;
 
-public record PatchTask(String id, String name, String status) {
+public record PatchTask(String id, String title, String status) {
 }

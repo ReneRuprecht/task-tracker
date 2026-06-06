@@ -5,10 +5,10 @@ import type { Task } from "../../../types/Task";
 import userEvent from "@testing-library/user-event";
 
 describe("TaskColumn", () => {
-  const openTask: Task = { id: "1", name: "refactor tests", status: "OPEN" };
+  const openTask: Task = { id: "1", title: "refactor tests", status: "OPEN" };
   const closedTask: Task = {
     id: "2",
-    name: "create test pipelines",
+    title: "create test pipelines",
     status: "CLOSED",
   };
   const tasks: Task[] = [openTask, closedTask] as const;

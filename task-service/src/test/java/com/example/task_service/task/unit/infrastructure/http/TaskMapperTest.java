@@ -3,7 +3,7 @@ package com.example.task_service.task.unit.infrastructure.http;
 import com.example.task_service.task.application.PatchTask;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskName;
+import com.example.task_service.task.domain.TaskTitle;
 import com.example.task_service.task.domain.TaskStatus;
 import com.example.task_service.task.infrastructure.http.CreateTaskRequest;
 import com.example.task_service.task.infrastructure.http.CreateTaskResponse;
@@ -26,7 +26,7 @@ public class TaskMapperTest {
         Task task = TaskMapper.fromRequest(createTaskRequest);
 
         assertFalse(task.getId().toString().isBlank());
-        assertEquals("feature", task.getName().toString());
+        assertEquals("feature", task.getTitle().toString());
         assertEquals("OPEN", task.getStatus().value().toString());
     }
 
@@ -42,7 +42,7 @@ public class TaskMapperTest {
         PatchTask patchTask = TaskMapper.toPatchTask(id.toString(), patchTaskRequest);
 
         assertEquals(id.toString(), patchTask.id());
-        assertEquals("feature", patchTask.name());
+        assertEquals("feature", patchTask.title());
         assertEquals("open", patchTask.status());
     }
 
@@ -50,14 +50,14 @@ public class TaskMapperTest {
     void shouldMapTaskToCreateTaskResponse() {
 
         TaskID id = TaskID.newTaskID();
-        TaskName name = TaskName.newTaskName("feature");
+        TaskTitle title = TaskTitle.newTaskTitle("feature");
         TaskStatus status = TaskStatus.newTaskStatus();
-        Task task = new Task(id, name, status);
+        Task task = new Task(id, title, status);
 
         CreateTaskResponse createTaskResponse = TaskMapper.toCreateTaskResponse(task);
 
         assertFalse(createTaskResponse.id().isBlank());
-        assertEquals("feature", createTaskResponse.name());
+        assertEquals("feature", createTaskResponse.title());
         assertEquals("OPEN", createTaskResponse.status());
     }
 }

@@ -16,9 +16,9 @@ public class PatchTaskUseCase {
         Task task = this.repository.findByID(id).orElseThrow(TaskNotFoundException::new);
 
 
-        if (!patchTask.name().isBlank()) {
-            TaskName name = TaskName.newTaskName(patchTask.name());
-            task.setName(name);
+        if (!patchTask.title().isBlank()) {
+            TaskTitle title = TaskTitle.newTaskTitle(patchTask.title());
+            task.setTitle(title);
         }
 
         if (!patchTask.status().isBlank()) {
