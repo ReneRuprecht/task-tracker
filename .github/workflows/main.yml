@@ -7,7 +7,7 @@ on:
 
 jobs:
   backend-unit:
-    name: "Backend"
+    name: "Backend Unit Tests"
     strategy:
       matrix:
         service:
@@ -20,7 +20,7 @@ jobs:
       checks: write
 
   backend-integration:
-    name: "Backend"
+    name: "Backend Integration Tests"
     needs: backend-unit
     strategy:
       matrix:
