@@ -1,4 +1,4 @@
-package com.example.task_service.integration.infrastructure.database;
+package com.example.task_service.project.integration.infrastructure.database;
 
 import com.example.task_service.project.domain.Project;
 import com.example.task_service.project.infrastructure.database.JPAProjectRepository;
