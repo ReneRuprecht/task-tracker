@@ -6,19 +6,35 @@ on:
       - main
 
 jobs:
-  test-services:
+  backend-unit:
+    name: "Backend"
     strategy:
       matrix:
         service:
           - task-service
           - user-service
-    uses: ./.github/workflows/backend.yml
+    uses: ./.github/workflows/backend-unit-test.yml
+    with:
+      service: ${{ matrix.service }}
+    permissions:
+      checks: write
+
+  backend-integration:
+    name: "Backend"
+    needs: backend-unit
+    strategy:
+      matrix:
+        service:
+          - task-service
+          - user-service
+    uses: ./.github/workflows/backend-integration-test.yml
     with:
       service: ${{ matrix.service }}
     permissions:
       checks: write
 
   test-frontend:
+    name: "Frontend"
     uses: ./.github/workflows/frontend.yml
     permissions:
       contents: read

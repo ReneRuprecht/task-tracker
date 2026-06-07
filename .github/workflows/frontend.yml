@@ -1,4 +1,4 @@
-name: Frontend
+name: Tests
 
 on:
   workflow_call:
