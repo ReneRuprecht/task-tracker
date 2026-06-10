@@ -11,7 +11,6 @@ export function useTasks(projectID: string | null) {
 
   useEffect(() => {
     if (!projectID) {
-      setTasks([]);
       return;
     }
 
