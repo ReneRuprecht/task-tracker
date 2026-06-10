@@ -42,7 +42,7 @@ export default function TaskCard({ task, onUpdated }: TaskCardProps) {
   return (
     <div
       role="button"
-      onClick={hoverMode === "toggle" ? handleToggle : () => {}}
+      onClick={handleToggle}
       className={cn(
         "group mx-10 flex cursor-pointer items-center justify-between",
         "rounded-lg border-4 border-white bg-white px-4 py-3",
@@ -55,7 +55,11 @@ export default function TaskCard({ task, onUpdated }: TaskCardProps) {
       <div
         className="flex items-center gap-3"
         onMouseEnter={() => setHoverMode("edit")}
-        onMouseLeave={() => setHoverMode(null)}
+        onMouseLeave={() => setHoverMode("toggle")}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsEditing(true);
+        }}
       >
         <TaskCardStatusDot status={task.status} hoverMode={hoverMode} />
         <TaskCardTitle
