@@ -9,7 +9,7 @@ import { getTaskCardWrapperStyle } from "./taskCard.styles";
 
 interface TaskCardProps {
   task: Task;
-  onUpdated: (taskID: string, title: string, status: TaskStatus) => void;
+  onUpdated: (task: Task) => void;
 }
 
 export default function TaskCard({ task, onUpdated }: TaskCardProps) {
@@ -17,7 +17,9 @@ export default function TaskCard({ task, onUpdated }: TaskCardProps) {
   const handleToggle = async () => {
     const newStatus: TaskStatus = toggleTaskStatus(task.status);
 
-    onUpdated(task.id, task.title, newStatus);
+    const updatedTask = { ...task, status: newStatus };
+
+    onUpdated(updatedTask);
   };
   const taskCardWrapperStyle = getTaskCardWrapperStyle(task.status, hoverMode);
   const [isEditing, setIsEditing] = useState(false);
@@ -25,16 +27,15 @@ export default function TaskCard({ task, onUpdated }: TaskCardProps) {
 
   const startEdit = () => {
     setIsEditing(true);
-    setTitle(task.title);
   };
 
   const cancelEdit = () => {
-    setTitle(task.title);
     setIsEditing(false);
   };
 
   const saveEdit = () => {
-    onUpdated(task.id, title, task.status);
+    const updatedTask = { ...task, title: title };
+    onUpdated(updatedTask);
     setIsEditing(false);
   };
 

@@ -1,9 +1,8 @@
 package com.example.task_service.task.integration.infrastructure.database;
 
+import com.example.task_service.project.domain.ProjectID;
 import com.example.task_service.task.domain.Task;
-import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskStatus;
-import com.example.task_service.task.domain.TaskTitle;
+import com.example.task_service.task.domain.TaskProjectID;
 import com.example.task_service.task.infrastructure.database.JPATaskRepository;
 import com.example.task_service.task.infrastructure.database.TaskEntity;
 import com.example.task_service.task.infrastructure.database.TaskRepository;
@@ -15,7 +14,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -35,10 +36,9 @@ public class TaskRepositoryIT {
     @Test
     void shouldSaveTask() {
 
-        TaskID id = TaskID.newTaskID();
-        TaskTitle title = TaskTitle.newTaskTitle("test-task");
-        TaskStatus status = TaskStatus.newTaskStatus();
-        Task task = new Task(id, title, status);
+        String title = "test-task";
+        UUID projectID = UUID.randomUUID();
+        Task task = Task.create(title, projectID);
 
         underTest.save(task);
 
@@ -46,22 +46,18 @@ public class TaskRepositoryIT {
         assertFalse(taskEntities.isEmpty());
 
         TaskEntity entity = taskEntities.getFirst();
-        assertEquals(id.toString(), entity.getId().toString());
+        assertEquals(task.getId().toString(), entity.getId().toString());
     }
 
     @Test
     void shouldListTasks() {
 
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
-        );
-        Task task2 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("refactor"),
-                TaskStatus.fromStatus(TaskStatus.Status.CLOSED)
-        );
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
+
+        UUID p2ID = UUID.randomUUID();
+        Task task2 = Task.create("refactor", p2ID);
+        task2.getStatus().close();
 
         underTest.save(task1);
         underTest.save(task2);
@@ -74,21 +70,20 @@ public class TaskRepositoryIT {
         assertEquals(task1.getId().toString(), firstTask.getId().toString());
         assertEquals("feature", firstTask.getTitle().toString());
         assertEquals("OPEN", firstTask.getStatus().value().toString());
+        assertNotNull(firstTask.getProjectID());
 
         Task secondTask = tasks.get(1);
         assertEquals(task2.getId().toString(), secondTask.getId().toString());
         assertEquals("refactor", secondTask.getTitle().toString());
         assertEquals("CLOSED", secondTask.getStatus().value().toString());
+        assertNotNull(secondTask.getProjectID());
     }
 
     @Test
     void shouldFindTaskByID() {
 
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
-        );
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
 
         underTest.save(task1);
 
@@ -105,11 +100,8 @@ public class TaskRepositoryIT {
     @Test
     void shouldReturnEmptyOptionalIfFindTaskByIDIsEmpty() {
 
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
-        );
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
 
         Optional<Task> task = underTest.findByID(task1.getId());
 
@@ -117,5 +109,26 @@ public class TaskRepositoryIT {
 
     }
 
+    @Test
+    void shouldReturnTasksByTaskProjectID() {
+
+        ProjectID projectID = ProjectID.newProjectID();
+        Task task1 = Task.create("feature", projectID.id());
+        Task task2 = Task.create("refactor", projectID.id());
+
+        underTest.save(task1);
+        underTest.save(task2);
+
+        List<Task> tasks = underTest.listTasksByProjectID(TaskProjectID.of(projectID.id()));
+
+        assertEquals(2, tasks.size());
+        assertThat(tasks)
+                .extracting(t -> t.getTitle().toString())
+                .containsExactlyInAnyOrder(
+                        task1.getTitle().toString(),
+                        task2.getTitle().toString()
+                );
+
+    }
 
 }

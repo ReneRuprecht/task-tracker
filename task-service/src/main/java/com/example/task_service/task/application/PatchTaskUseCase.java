@@ -1,5 +1,6 @@
 package com.example.task_service.task.application;
 
+import com.example.task_service.task.application.commands.PatchTaskCommand;
 import com.example.task_service.task.domain.*;
 import com.example.task_service.task.domain.exception.TaskNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -11,21 +12,20 @@ public class PatchTaskUseCase {
 
     private final RepositoryPort repository;
 
-    public void execute(PatchTask patchTask) {
-        TaskID id = TaskID.fromString(patchTask.id());
+    public Task execute(PatchTaskCommand patchTaskCommand) {
+        TaskID id = TaskID.of(patchTaskCommand.id());
         Task task = this.repository.findByID(id).orElseThrow(TaskNotFoundException::new);
 
-
-        if (!patchTask.title().isBlank()) {
-            TaskTitle title = TaskTitle.newTaskTitle(patchTask.title());
+        if (patchTaskCommand.title().isPresent()) {
+            TaskTitle title = TaskTitle.newTaskTitle(patchTaskCommand.title().get());
             task.setTitle(title);
         }
 
-        if (!patchTask.status().isBlank()) {
-            TaskStatus status = TaskStatus.fromString(patchTask.status());
+        if (patchTaskCommand.status().isPresent()) {
+            TaskStatus status = TaskStatus.fromString(patchTaskCommand.status().get());
             task.setStatus(status);
         }
 
-        this.repository.save(task);
+        return this.repository.save(task);
     }
 }

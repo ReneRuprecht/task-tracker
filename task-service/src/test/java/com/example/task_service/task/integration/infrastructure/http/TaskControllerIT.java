@@ -1,15 +1,17 @@
 package com.example.task_service.task.integration.infrastructure.http;
 
+import com.example.task_service.project.application.exception.ProjectNotFoundException;
 import com.example.task_service.task.application.CreateTaskUseCase;
 import com.example.task_service.task.application.FindTaskByIDUseCase;
 import com.example.task_service.task.application.ListTasksUseCase;
 import com.example.task_service.task.application.PatchTaskUseCase;
+import com.example.task_service.task.application.commands.CreateTaskCommand;
+import com.example.task_service.task.application.commands.PatchTaskCommand;
 import com.example.task_service.task.domain.Task;
-import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskTitle;
-import com.example.task_service.task.domain.TaskStatus;
+import com.example.task_service.task.domain.exception.EmptyTaskTitleException;
 import com.example.task_service.task.domain.exception.TaskNotFoundException;
 import com.example.task_service.task.infrastructure.http.TaskController;
+import com.example.task_service.task.infrastructure.http.request.CreateTaskRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -17,8 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -48,13 +52,21 @@ public class TaskControllerIT {
 
     @Test
     void shouldCreateTaskWithStatusCreated() throws Exception {
+        UUID projectID = UUID.randomUUID();
+        Task task = Task.create("My Task", projectID);
 
+        CreateTaskRequest createTaskRequest = new CreateTaskRequest("My Task", projectID);
+        when(createTaskUseCase.execute(new CreateTaskCommand(
+                "My Task",
+                projectID
+        ))).thenReturn(task);
 
-        mockMvc.perform(post("/api/v1/tasks").contentType(MediaType.APPLICATION_JSON).content("""
-                    {
-                      "title": "My Task"
-                    }
-                """)).andExpect(status().isCreated())
+        ObjectMapper mapper = new ObjectMapper();
+        mockMvc
+                .perform(post("/api/v1/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(createTaskRequest)))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath(".title").value("My Task"))
                 .andExpect(jsonPath(".status").value("OPEN"));
     }
@@ -62,27 +74,45 @@ public class TaskControllerIT {
     @Test
     void shouldReturnStatus400WithBadRequestData() throws Exception {
 
+        UUID projectID = UUID.randomUUID();
 
-        mockMvc.perform(post("/api/v1/tasks").contentType(MediaType.APPLICATION_JSON).content("""
-                    {
-                      "title": ""
-                    }
-                """)).andExpect(status().isBadRequest());
+        CreateTaskRequest createTaskRequest = new CreateTaskRequest("", projectID);
+        ObjectMapper mapper = new ObjectMapper();
+
+        when(createTaskUseCase.execute(any())).thenThrow(EmptyTaskTitleException.class);
+
+        mockMvc
+                .perform(post("/api/v1/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(createTaskRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnStatus404WhenProjectNotExist() throws Exception {
+
+        UUID projectID = UUID.randomUUID();
+
+        CreateTaskRequest createTaskRequest = new CreateTaskRequest("", projectID);
+        ObjectMapper mapper = new ObjectMapper();
+
+        when(createTaskUseCase.execute(any())).thenThrow(ProjectNotFoundException.class);
+
+        mockMvc
+                .perform(post("/api/v1/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(createTaskRequest)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldListTasks() throws Exception {
 
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
-        );
-        Task task2 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("refactor"),
-                TaskStatus.newTaskStatus()
-        );
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
+
+        UUID p2ID = UUID.randomUUID();
+        Task task2 = Task.create("refactor", p2ID);
 
         when(listTasksUseCase.execute()).thenReturn(List.of(task1, task2));
 
@@ -97,7 +127,6 @@ public class TaskControllerIT {
     @Test
     void shouldListTasksWithEmptyList() throws Exception {
 
-
         when(listTasksUseCase.execute()).thenReturn(List.of());
 
         mockMvc
@@ -109,11 +138,8 @@ public class TaskControllerIT {
     @Test
     void shouldFindTaskByID() throws Exception {
 
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
-        );
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
 
         when(findTaskByIDUseCase.execute(any())).thenReturn(task1);
 
@@ -128,11 +154,8 @@ public class TaskControllerIT {
     @Test
     void shouldReturnStatus404IfFindTaskByIDIsEmpty() throws Exception {
 
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
-        );
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
 
         when(findTaskByIDUseCase.execute(any())).thenThrow(TaskNotFoundException.class);
 
@@ -145,22 +168,23 @@ public class TaskControllerIT {
     @Test
     void shouldPatchTask() throws Exception {
 
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
-        );
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
+        task1.getStatus().close();
 
+        when(patchTaskUseCase.execute(any(PatchTaskCommand.class))).thenReturn(task1);
         mockMvc
-                .perform(patch(String.format("/api/v1/tasks/%s", task1.getId().toString()))
+                .perform(patch(String.format("/api/v1/tasks/%s", task1.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                     {
-                                      "title": "refactor",
+                                      "title": "feature",
                                       "status": "closed"
                                     }
                                 """))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("feature"))
+                .andExpect(jsonPath("$.status").value("CLOSED"));
     }
 
 }

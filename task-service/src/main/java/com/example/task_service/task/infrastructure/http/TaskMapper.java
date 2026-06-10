@@ -1,23 +1,22 @@
 package com.example.task_service.task.infrastructure.http;
 
-import com.example.task_service.task.application.PatchTask;
+import com.example.task_service.task.application.commands.CreateTaskCommand;
+import com.example.task_service.task.application.commands.PatchTaskCommand;
 import com.example.task_service.task.domain.Task;
-import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskStatus;
-import com.example.task_service.task.domain.TaskTitle;
+import com.example.task_service.task.infrastructure.http.request.CreateTaskRequest;
+import com.example.task_service.task.infrastructure.http.request.PatchTaskRequest;
+import com.example.task_service.task.infrastructure.http.response.CreateTaskResponse;
+import com.example.task_service.task.infrastructure.http.response.FindTaskResponse;
+import com.example.task_service.task.infrastructure.http.response.ListTasksResponse;
+import com.example.task_service.task.infrastructure.http.response.TaskResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 public class TaskMapper {
 
-    public static Task fromRequest(CreateTaskRequest createTaskRequest) {
-        TaskID id = TaskID.newTaskID();
-
-        TaskTitle title = TaskTitle.newTaskTitle(createTaskRequest.title());
-
-        TaskStatus status = TaskStatus.newTaskStatus();
-
-        return new Task(id, title, status);
+    public static CreateTaskCommand toCreateTaskCommand(CreateTaskRequest createTaskRequest) {
+        return new CreateTaskCommand(createTaskRequest.title(), createTaskRequest.projectID());
     }
 
     public static ListTasksResponse toListTasksResponse(List<Task> tasks) {
@@ -31,7 +30,8 @@ public class TaskMapper {
         return new TaskResponse(
                 task.getId().toString(),
                 task.getTitle().toString(),
-                task.getStatus().value().toString()
+                task.getStatus().value().toString(),
+                task.getProjectID().toString()
         );
 
     }
@@ -40,27 +40,23 @@ public class TaskMapper {
         return new FindTaskResponse(
                 task.getId().toString(),
                 task.getTitle().toString(),
-                task.getStatus().value().toString()
+                task.getStatus().value().toString(),
+                task.getProjectID().id()
+
         );
     }
 
-    public static TaskID toTaskID(String id) {
-        return TaskID.fromString(id);
-    }
 
-    public static PatchTask toPatchTask(String id, PatchTaskRequest patchTaskRequest) {
-        return new PatchTask(
-                id,
-                patchTaskRequest.title().orElse(""),
-                patchTaskRequest.status().orElse("")
-        );
+    public static PatchTaskCommand toPatchTaskCommand(UUID id, PatchTaskRequest patchTaskRequest) {
+        return new PatchTaskCommand(id, patchTaskRequest.title(), patchTaskRequest.status());
     }
 
     public static CreateTaskResponse toCreateTaskResponse(Task task) {
         return new CreateTaskResponse(
                 task.getId().toString(),
                 task.getTitle().toString(),
-                task.getStatus().value().toString()
+                task.getStatus().value().toString(),
+                task.getProjectID().id()
         );
     }
 

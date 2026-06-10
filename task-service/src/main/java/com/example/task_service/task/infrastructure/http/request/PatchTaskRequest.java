@@ -1,4 +1,4 @@
-package com.example.task_service.task.infrastructure.http;
+package com.example.task_service.task.infrastructure.http.request;
 
 import java.util.Optional;
 

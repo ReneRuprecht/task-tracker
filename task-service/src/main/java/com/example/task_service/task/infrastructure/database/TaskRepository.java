@@ -3,12 +3,12 @@ package com.example.task_service.task.infrastructure.database;
 import com.example.task_service.task.domain.RepositoryPort;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
+import com.example.task_service.task.domain.TaskProjectID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,21 +16,29 @@ public class TaskRepository implements RepositoryPort {
 
     private final JPATaskRepository jpaTaskRepository;
 
-    public void save(Task task) {
-        TaskEntity entity = TaskMapper.fromDomain(task);
-        this.jpaTaskRepository.save(entity);
+    public Task save(Task task) {
+        TaskEntity entity = TaskMapper.toEntity(task);
+        TaskEntity saved = jpaTaskRepository.save(entity);
+        return TaskMapper.toDomain(saved);
     }
 
     @Override
     public List<Task> findAll() {
-        return jpaTaskRepository.findAll().stream().map(TaskMapper::fromEntity).toList();
+        return jpaTaskRepository.findAll().stream().map(TaskMapper::toDomain).toList();
     }
 
     @Override
     public Optional<Task> findByID(TaskID id) {
-        UUID uuidID = UUID.fromString(id.toString());
-        return jpaTaskRepository.findById(uuidID).map(TaskMapper::fromEntity);
+        return jpaTaskRepository.findById(id.id()).map(TaskMapper::toDomain);
+    }
 
+    @Override
+    public List<Task> listTasksByProjectID(TaskProjectID projectID) {
+        return jpaTaskRepository
+                .findAllByProjectID(projectID.id())
+                .stream()
+                .map(TaskMapper::toDomain)
+                .toList();
     }
 
 }

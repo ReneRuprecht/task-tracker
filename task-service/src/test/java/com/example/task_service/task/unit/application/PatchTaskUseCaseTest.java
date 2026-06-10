@@ -1,11 +1,9 @@
 package com.example.task_service.task.unit.application;
 
-import com.example.task_service.task.application.PatchTask;
 import com.example.task_service.task.application.PatchTaskUseCase;
+import com.example.task_service.task.application.commands.PatchTaskCommand;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskTitle;
-import com.example.task_service.task.domain.TaskStatus;
 import com.example.task_service.task.domain.exception.TaskNotFoundException;
 import com.example.task_service.task.infrastructure.database.TaskRepository;
 import org.junit.jupiter.api.Test;
@@ -16,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,17 +33,19 @@ public class PatchTaskUseCaseTest {
 
 
     @Test
-    void shouldExecuteWithAllPatchTaskFields() {
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
+    void shouldPatchTaskWithAllFields() {
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
+
+        PatchTaskCommand patchTaskCommand = new PatchTaskCommand(
+                task1.getId().id(),
+                Optional.of("refactor"),
+                Optional.of("closed")
         );
-        PatchTask patchTask = new PatchTask(task1.getId().toString(), "refactor", "closed");
 
         when(repository.findByID(any())).thenReturn(Optional.of(task1));
 
-        underTest.execute(patchTask);
+        underTest.execute(patchTaskCommand);
 
         ArgumentCaptor<Task> taskCaptor = ArgumentCaptor.forClass(Task.class);
 
@@ -58,42 +59,45 @@ public class PatchTaskUseCaseTest {
     }
 
     @Test
-    void shouldExecuteWithEmptyPatchTaskFields() {
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
+    void shouldNotPatchTaskWithEmptyFields() {
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
+
+        PatchTaskCommand patchTaskCommand = new PatchTaskCommand(
+                task1.getId().id(),
+                Optional.empty(),
+                Optional.empty()
         );
-        PatchTask patchTask = new PatchTask(task1.getId().toString(), "", "");
 
         when(repository.findByID(any())).thenReturn(Optional.of(task1));
+        ArgumentCaptor<Task> captor = ArgumentCaptor.forClass(Task.class);
 
-        underTest.execute(patchTask);
+        underTest.execute(patchTaskCommand);
 
-        ArgumentCaptor<Task> taskCaptor = ArgumentCaptor.forClass(Task.class);
+        verify(repository).findByID(any(TaskID.class));
+        verify(repository).save(captor.capture());
 
-        verify(repository).findByID(any());
-        verify(repository).save(taskCaptor.capture());
+        Task patchedTask = captor.getValue();
 
-        Task savedTask = taskCaptor.getValue();
-
-        assertEquals("feature", savedTask.getTitle().toString());
-        assertEquals("OPEN", savedTask.getStatus().value().toString());
+        assertEquals("feature", patchedTask.getTitle().toString());
+        assertEquals("OPEN", patchedTask.getStatus().value().toString());
     }
 
     @Test
     void shouldThrowTaskNotFoundIfTaskNotExists() {
 
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
+        UUID p1ID = UUID.randomUUID();
+        Task task1 = Task.create("feature", p1ID);
+
+        PatchTaskCommand patchTaskCommand = new PatchTaskCommand(
+                task1.getId().id(),
+                Optional.of("refactor"),
+                Optional.of("closed")
         );
-        PatchTask patchTask = new PatchTask(task1.getId().toString(), "refactor", "closed");
         when(repository.findByID(any())).thenReturn(Optional.empty());
         assertThrows(
                 TaskNotFoundException.class, () -> {
-                    underTest.execute(patchTask);
+                    underTest.execute(patchTaskCommand);
                 }
         );
 

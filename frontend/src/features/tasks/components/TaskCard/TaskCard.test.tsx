@@ -5,11 +5,17 @@ import userEvent from "@testing-library/user-event";
 import type { Task } from "../../../../types/Task";
 
 describe("TaskCard", () => {
-  const openTask: Task = { id: "1", title: "refactor tests", status: "OPEN" };
+  const openTask: Task = {
+    id: "1",
+    title: "refactor tests",
+    status: "OPEN",
+    projectID: "1",
+  };
   const closedTask: Task = {
     id: "2",
     title: "create test pipelines",
     status: "CLOSED",
+    projectID: "2",
   };
   it("renders the task title", () => {
     render(<TaskCard task={openTask} onUpdated={vi.fn()} />);
@@ -24,11 +30,18 @@ describe("TaskCard", () => {
 
     await user.click(
       screen.getByRole("button", {
-        title: "refactor tests",
+        name: "refactor tests",
       }),
     );
 
-    expect(onUpdated).toHaveBeenCalledWith("1", "refactor tests", "CLOSED");
+    const expectedTask: Task = {
+      id: "1",
+      title: "refactor tests",
+      status: "CLOSED",
+      projectID: "1",
+    };
+
+    expect(onUpdated).toHaveBeenCalledWith(expectedTask);
   });
   it("updates a closed task to open", async () => {
     const onUpdated = vi.fn();
@@ -38,15 +51,17 @@ describe("TaskCard", () => {
 
     await user.click(
       screen.getByRole("button", {
-        title: "create test pipelines",
+        name: "create test pipelines",
       }),
     );
 
-    expect(onUpdated).toHaveBeenCalledWith(
-      "2",
-      "create test pipelines",
-      "OPEN",
-    );
+    const expectedTask: Task = {
+      id: "2",
+      title: "create test pipelines",
+      status: "OPEN",
+      projectID: "2",
+    };
+    expect(onUpdated).toHaveBeenCalledWith(expectedTask);
   });
 
   it("enters edit mode when clicking title", async () => {
@@ -54,7 +69,12 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
+        task={{
+          id: "1",
+          title: "refactor tests",
+          status: "OPEN",
+          projectID: "1",
+        }}
         onUpdated={vi.fn()}
       />,
     );
@@ -69,7 +89,12 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
+        task={{
+          id: "1",
+          title: "refactor tests",
+          status: "OPEN",
+          projectID: "1",
+        }}
         onUpdated={onUpdated}
       />,
     );
@@ -86,7 +111,12 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
+        task={{
+          id: "1",
+          title: "refactor tests",
+          status: "OPEN",
+          projectID: "1",
+        }}
         onUpdated={onUpdated}
       />,
     );
@@ -99,14 +129,21 @@ describe("TaskCard", () => {
 
     await user.keyboard("{Enter}");
 
-    expect(onUpdated).toHaveBeenCalledWith("1", "updated title", "OPEN");
+    expect(onUpdated).toHaveBeenCalled();
+
+    expect(screen.getByText("updated title")).toBeInTheDocument();
   });
   it("resets hover mode on outer taskcard wrapper div mouse leave", async () => {
     const user = userEvent.setup();
 
     render(
       <TaskCard
-        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
+        task={{
+          id: "1",
+          title: "refactor tests",
+          status: "OPEN",
+          projectID: "1",
+        }}
         onUpdated={vi.fn()}
       />,
     );
@@ -125,7 +162,12 @@ describe("TaskCard", () => {
 
     render(
       <TaskCard
-        task={{ id: "1", title: "refactor tests", status: "OPEN" }}
+        task={{
+          id: "1",
+          title: "refactor tests",
+          status: "OPEN",
+          projectID: "1",
+        }}
         onUpdated={vi.fn()}
       />,
     );

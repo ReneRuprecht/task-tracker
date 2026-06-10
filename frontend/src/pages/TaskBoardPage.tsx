@@ -1,74 +1,61 @@
-import { useEffect, useState } from "react";
-import type { Task, Tasks, TaskStatus } from "../types/Task";
-import { getTasks } from "../features/tasks/api/GetTasks";
-import TaskColumn from "../features/tasks/components/TaskColumn";
+import TaskBoard from "../features/tasks/components/TaskBoard";
 import { ProgressBar } from "../components/ui/Progressbar";
-import { createTask } from "../features/tasks/api/CreateTask";
-import { updateTask } from "../features/tasks/api/UpdateTask";
+import ProjectDropdown from "../features/projects/components/ProjectDowndown";
+import { useProjects } from "../features/projects/hooks/projectHook";
+import { useTasks } from "../features/tasks/hooks/taskHook";
+import { getClosedTasks } from "../features/tasks/utils/taskFilters";
 
 export default function TaskBoardPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    projects,
+    selectedProject,
+    selectProject,
+    createNewProject,
+    selectedProjectId,
+    loading: projectsLoading,
+    error: projectsError,
+  } = useProjects();
 
-  const handleTaskUpdated = async (
-    taskId: string,
-    title: string,
-    status: TaskStatus,
-  ) => {
-    const updatedTask: Task = { id: taskId, title: title, status: status };
+  const {
+    tasks,
+    loading: tasksLoading,
+    error: tasksError,
+    createNewTask,
+    updateExistingTask,
+  } = useTasks(selectedProjectId);
 
-    await updateTask(updatedTask);
+  const error = projectsError || tasksError;
 
-    setTasks((prev) =>
-      prev.map((task) => (task.id === taskId ? updatedTask : task)),
-    );
-  };
+  const closedTasks = getClosedTasks(tasks);
 
-  const handleCreateTask = async (title: string) => {
-    const newTask = await createTask(title);
-    setTasks([newTask, ...tasks]);
-  };
-
-  const closedTask = tasks.filter((task) => task.status === "CLOSED");
   const progress =
     tasks.length === 0
       ? 0
-      : Math.round((closedTask.length / tasks.length) * 100);
+      : Math.round((closedTasks.length / tasks.length) * 100);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const data: Tasks = await getTasks();
-
-        const extractedTasks: Task[] = [...data.tasks];
-
-        setTasks(extractedTasks);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("Unknown error");
-        }
-        setTasks([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTasks();
-  }, []);
-
-  if (loading) return <h1>Lädt aktuelle Tasks</h1>;
-  if (error) return <h1>Fehler: {error}</h1>;
+  if (projectsLoading || tasksLoading) return <h1>Lädt...</h1>;
 
   return (
     <>
+      {error && (
+        <div className="mb-2 rounded bg-red-100 px-4 py-2 text-red-700">
+          Fehler: {error}
+        </div>
+      )}
+
       <ProgressBar value={progress} />
-      <TaskColumn
-        onTaskUpdate={handleTaskUpdated}
+
+      <ProjectDropdown
+        selected={selectedProject}
+        onSelect={selectProject}
+        projects={projects}
+        onProjectCreate={createNewProject}
+      />
+
+      <TaskBoard
+        onTaskUpdate={updateExistingTask}
         tasks={tasks}
-        onCreateTask={handleCreateTask}
+        onCreateTask={createNewTask}
       />
     </>
   );

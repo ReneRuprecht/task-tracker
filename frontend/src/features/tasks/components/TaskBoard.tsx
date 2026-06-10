@@ -1,20 +1,20 @@
 import { useState } from "react";
-import type { Task, TaskStatus } from "../../../types/Task";
+import type { Task } from "../../../types/Task";
 import ClosedTaskColumn from "./ClosedTaskCollumn";
 import OpenTaskColumn from "./OpenTaskColumn";
 import { getClosedTasks, getOpenTasks } from "../utils/taskFilters";
 
-interface TaskColumnProps {
+interface TaskBoardProps {
   tasks: Task[];
-  onTaskUpdate: (taskID: string, title: string, status: TaskStatus) => void;
+  onTaskUpdate: (task: Task) => void;
   onCreateTask: (title: string) => void;
 }
 
-export default function TaskColumn({
+export default function TaskBoard({
   tasks,
   onTaskUpdate,
   onCreateTask,
-}: TaskColumnProps) {
+}: TaskBoardProps) {
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateTask = (title: string) => {

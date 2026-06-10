@@ -2,6 +2,7 @@ package com.example.task_service.project.application;
 
 import com.example.task_service.project.domain.Project;
 import com.example.task_service.project.domain.ProjectID;
+import com.example.task_service.task.domain.Task;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,8 +1,8 @@
-import type { Task, TaskStatus } from "../../../types/Task";
+import type { Task } from "../../../types/Task";
 import TaskCard from "./TaskCard/TaskCard";
 
 interface ClosedTaskColumnProps {
-  onTaskUpdate: (taskID: string, title: string, status: TaskStatus) => void;
+  onTaskUpdate: (task: Task) => void;
   closedTasks: Task[];
 }
 

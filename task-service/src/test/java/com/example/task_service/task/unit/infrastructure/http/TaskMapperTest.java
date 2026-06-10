@@ -1,58 +1,57 @@
 package com.example.task_service.task.unit.infrastructure.http;
 
-import com.example.task_service.task.application.PatchTask;
+import com.example.task_service.task.application.commands.CreateTaskCommand;
+import com.example.task_service.task.application.commands.PatchTaskCommand;
 import com.example.task_service.task.domain.Task;
-import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskTitle;
-import com.example.task_service.task.domain.TaskStatus;
-import com.example.task_service.task.infrastructure.http.CreateTaskRequest;
-import com.example.task_service.task.infrastructure.http.CreateTaskResponse;
-import com.example.task_service.task.infrastructure.http.PatchTaskRequest;
 import com.example.task_service.task.infrastructure.http.TaskMapper;
+import com.example.task_service.task.infrastructure.http.request.CreateTaskRequest;
+import com.example.task_service.task.infrastructure.http.request.PatchTaskRequest;
+import com.example.task_service.task.infrastructure.http.response.CreateTaskResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskMapperTest {
 
     @Test
-    void shouldMapCreateTaskRequestToDomainTask() {
+    void shouldMapCreateTaskRequestToCreateTaskCommand() {
 
-        CreateTaskRequest createTaskRequest = new CreateTaskRequest("feature");
+        UUID projectID = UUID.randomUUID();
+        CreateTaskRequest createTaskRequest = new CreateTaskRequest("feature", projectID);
 
-        Task task = TaskMapper.fromRequest(createTaskRequest);
+        CreateTaskCommand createTaskCommand = TaskMapper.toCreateTaskCommand(createTaskRequest);
 
-        assertFalse(task.getId().toString().isBlank());
-        assertEquals("feature", task.getTitle().toString());
-        assertEquals("OPEN", task.getStatus().value().toString());
+        assertFalse(createTaskCommand.title().isBlank());
+        assertNotNull(createTaskCommand.projectID());
     }
 
     @Test
-    void shouldMapStringIDAndPatchTaskRequestToPatchTask() {
+    void shouldMapPatchTaskRequestToPatchTaskCommand() {
 
-        TaskID id = TaskID.newTaskID();
+        UUID id = UUID.randomUUID();
         PatchTaskRequest patchTaskRequest = new PatchTaskRequest(
                 Optional.of("feature"),
                 Optional.of("open")
         );
 
-        PatchTask patchTask = TaskMapper.toPatchTask(id.toString(), patchTaskRequest);
+        PatchTaskCommand patchTaskCommand = TaskMapper.toPatchTaskCommand(id, patchTaskRequest);
 
-        assertEquals(id.toString(), patchTask.id());
-        assertEquals("feature", patchTask.title());
-        assertEquals("open", patchTask.status());
+        assertEquals(id.toString(), patchTaskCommand.id().toString());
+        assertTrue(patchTaskCommand.title().isPresent());
+        assertEquals("feature", patchTaskCommand.title().get());
+        assertTrue(patchTaskCommand.status().isPresent());
+        assertEquals("open", patchTaskCommand.status().get());
     }
 
     @Test
     void shouldMapTaskToCreateTaskResponse() {
 
-        TaskID id = TaskID.newTaskID();
-        TaskTitle title = TaskTitle.newTaskTitle("feature");
-        TaskStatus status = TaskStatus.newTaskStatus();
-        Task task = new Task(id, title, status);
+        String title = "feature";
+        UUID projectID = UUID.randomUUID();
+        Task task = Task.create(title, projectID);
 
         CreateTaskResponse createTaskResponse = TaskMapper.toCreateTaskResponse(task);
 

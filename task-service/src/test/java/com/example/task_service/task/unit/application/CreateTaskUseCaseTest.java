@@ -1,10 +1,10 @@
 package com.example.task_service.task.unit.application;
 
+import com.example.task_service.project.domain.Project;
+import com.example.task_service.project.infrastructure.database.ProjectRepository;
 import com.example.task_service.task.application.CreateTaskUseCase;
+import com.example.task_service.task.application.commands.CreateTaskCommand;
 import com.example.task_service.task.domain.Task;
-import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskTitle;
-import com.example.task_service.task.domain.TaskStatus;
 import com.example.task_service.task.infrastructure.database.TaskRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +12,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateTaskUseCaseTest {
@@ -20,19 +27,31 @@ public class CreateTaskUseCaseTest {
     @Mock
     TaskRepository repository;
 
+    @Mock
+    ProjectRepository projectRepository;
+
     @InjectMocks
     CreateTaskUseCase underTest;
 
 
     @Test
-    void shouldExecute() {
-        TaskID id = TaskID.newTaskID();
-        TaskTitle title = TaskTitle.newTaskTitle("test-task");
-        TaskStatus status = TaskStatus.newTaskStatus();
-        Task task = new Task(id, title, status);
+    void shouldCreateTask() {
+        UUID id = UUID.randomUUID();
+        CreateTaskCommand createTaskCommand = new CreateTaskCommand("test-task", id);
 
-        underTest.execute(task);
+        Task task = Task.create("test-task", id);
 
-        verify(repository).save(task);
+        Project project = Project.create("test");
+
+        when(projectRepository.findByID(any())).thenReturn(Optional.of(project));
+        when(repository.save(any(Task.class))).thenReturn(task);
+
+        Task saved = underTest.execute(createTaskCommand);
+
+        verify(repository).save(any(Task.class));
+
+        assertNotNull(saved.getId().id());
+        assertNotNull(saved.getProjectID().id());
+        assertEquals("test-task", saved.getTitle().toString());
     }
 }

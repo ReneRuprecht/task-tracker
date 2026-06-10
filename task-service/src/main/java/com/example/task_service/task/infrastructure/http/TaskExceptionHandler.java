@@ -1,5 +1,6 @@
 package com.example.task_service.task.infrastructure.http;
 
+import com.example.task_service.project.application.exception.ProjectNotFoundException;
 import com.example.task_service.task.domain.exception.EmptyTaskTitleException;
 import com.example.task_service.task.domain.exception.TaskNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,11 @@ public class TaskExceptionHandler {
 
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<String> handleTaskNotFoundException() {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<String> handleProjectNotFoundException() {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

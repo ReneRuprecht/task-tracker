@@ -1,25 +1,27 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import TaskColumn from "./TaskColumn";
+import TaskBoard from "./TaskBoard";
 import type { Task } from "../../../types/Task";
 import userEvent from "@testing-library/user-event";
 
-describe("TaskColumn", () => {
-  const openTask: Task = { id: "1", title: "refactor tests", status: "OPEN" };
+describe("TaskBoard", () => {
+  const openTask: Task = {
+    id: "1",
+    title: "refactor tests",
+    status: "OPEN",
+    projectID: "1",
+  };
   const closedTask: Task = {
     id: "2",
     title: "create test pipelines",
     status: "CLOSED",
+    projectID: "1",
   };
   const tasks: Task[] = [openTask, closedTask] as const;
 
   it("splits tasks into open and closed columns", () => {
     render(
-      <TaskColumn
-        tasks={tasks}
-        onCreateTask={vi.fn()}
-        onTaskUpdate={vi.fn()}
-      />,
+      <TaskBoard tasks={tasks} onCreateTask={vi.fn()} onTaskUpdate={vi.fn()} />,
     );
 
     expect(screen.getByText("refactor tests")).toBeInTheDocument();
@@ -29,7 +31,7 @@ describe("TaskColumn", () => {
     const user = userEvent.setup();
 
     render(
-      <TaskColumn tasks={[]} onTaskUpdate={vi.fn()} onCreateTask={vi.fn()} />,
+      <TaskBoard tasks={[]} onTaskUpdate={vi.fn()} onCreateTask={vi.fn()} />,
     );
 
     await user.click(screen.getByRole("button", { name: "new" }));
@@ -47,7 +49,7 @@ describe("TaskColumn", () => {
     const onCreateTask = vi.fn();
 
     render(
-      <TaskColumn
+      <TaskBoard
         tasks={[]}
         onTaskUpdate={vi.fn()}
         onCreateTask={onCreateTask}

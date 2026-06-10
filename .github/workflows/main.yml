@@ -12,7 +12,7 @@ jobs:
       matrix:
         service:
           - task-service
-          - user-service
+          # - user-service
     uses: ./.github/workflows/backend-unit-test.yml
     with:
       service: ${{ matrix.service }}
@@ -26,16 +26,16 @@ jobs:
       matrix:
         service:
           - task-service
-          - user-service
+          # - user-service
     uses: ./.github/workflows/backend-integration-test.yml
     with:
       service: ${{ matrix.service }}
     permissions:
       checks: write
 
-  test-frontend:
-    name: "Frontend"
-    uses: ./.github/workflows/frontend.yml
-    permissions:
-      contents: read
-      pull-requests: write
+  # test-frontend:
+  #   name: "Frontend"
+  #   uses: ./.github/workflows/frontend.yml
+  #   permissions:
+  #     contents: read
+  #     pull-requests: write

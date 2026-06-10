@@ -3,8 +3,11 @@ package com.example.task_service.project.integration.infrastructure.http;
 import com.example.task_service.project.application.CreateProjectCommand;
 import com.example.task_service.project.application.CreateProjectUseCase;
 import com.example.task_service.project.application.ListProjectsUseCase;
+import com.example.task_service.project.application.ListTasksByProjectIDUseCase;
 import com.example.task_service.project.domain.Project;
+import com.example.task_service.project.domain.ProjectID;
 import com.example.task_service.project.infrastructure.http.ProjectController;
+import com.example.task_service.task.domain.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -15,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,6 +38,10 @@ public class ProjectControllerIT {
 
     @MockitoBean
     ListProjectsUseCase listProjectsUseCase;
+
+    @MockitoBean
+    ListTasksByProjectIDUseCase listTasksByProjectIDUseCase;
+
 
     @Test
     void shouldCreateProjectWithStatusCreated() throws Exception {
@@ -55,7 +63,7 @@ public class ProjectControllerIT {
 
 
     @Test
-    void shouldListTasks() throws Exception {
+    void shouldListProjects() throws Exception {
 
         Project project1 = Project.create("My Project 1");
         Project project2 = Project.create("My Project 2");
@@ -68,6 +76,26 @@ public class ProjectControllerIT {
                 .andExpect(jsonPath("$.projects.length()").value(2))
                 .andExpect(jsonPath("$.projects[0].name").value("My Project 1"))
                 .andExpect(jsonPath("$.projects[1].name").value("My Project 2"));
+    }
+
+    @Test
+    void shouldListTaskByProject() throws Exception {
+
+        ProjectID id = ProjectID.newProjectID();
+        Task task1 = Task.create("task1", id.id());
+        Task task2 = Task.create("task2", id.id());
+
+        when(listTasksByProjectIDUseCase.execute(any(ProjectID.class))).thenReturn(List.of(
+                task1,
+                task2
+        ));
+
+        mockMvc
+                .perform(get(String.format("/api/v1/projects/%s", id)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tasks.length()").value(2))
+                .andExpect(jsonPath("$.tasks[0].title").value("task1"))
+                .andExpect(jsonPath("$.tasks[1].title").value("task2"));
     }
 
 }

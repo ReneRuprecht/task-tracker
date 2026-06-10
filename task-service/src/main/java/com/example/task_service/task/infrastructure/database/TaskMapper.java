@@ -1,28 +1,27 @@
 package com.example.task_service.task.infrastructure.database;
 
-import com.example.task_service.task.domain.Task;
-import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskTitle;
-import com.example.task_service.task.domain.TaskStatus;
+import com.example.task_service.task.domain.*;
 
 import java.util.UUID;
 
 public class TaskMapper {
 
-    public static TaskEntity fromDomain(Task task) {
+    public static TaskEntity toEntity(Task task) {
         UUID id = UUID.fromString(task.getId().toString());
         TaskEntity.Status status = fromDomainStatus(task);
+        UUID projectID = task.getProjectID().id();
 
-        return new TaskEntity(id, task.getTitle().toString(), status);
+        return new TaskEntity(id, task.getTitle().toString(), status, projectID);
     }
 
-    public static Task fromEntity(TaskEntity entity) {
+    public static Task toDomain(TaskEntity entity) {
 
-        TaskID id = TaskID.fromString(entity.getId().toString());
+        TaskID id = TaskID.of(entity.getId());
         TaskTitle title = TaskTitle.newTaskTitle(entity.getTitle());
         TaskStatus status = TaskStatus.fromStatus(fromEntityStatus(entity));
+        TaskProjectID projectID = TaskProjectID.of(entity.getProjectID());
 
-        return new Task(id, title, status);
+        return new Task(id, title, status, projectID);
     }
 
     private static TaskEntity.Status fromDomainStatus(Task task) {

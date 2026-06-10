@@ -20,9 +20,10 @@ public class TaskEntity {
     private String title;
     @Enumerated(EnumType.STRING)
     private Status status;
+    private UUID projectID;
+
     public enum Status {
-        OPEN,
-        CLOSED
+        OPEN, CLOSED
     }
 
 }

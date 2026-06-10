@@ -1,4 +1,4 @@
-import type { Task, TaskStatus } from "../../../types/Task";
+import type { Task } from "../../../types/Task";
 import { cn } from "../../../utils/tailwind";
 import CreateTaskCard from "./CreateTaskCard";
 import TaskCard from "./TaskCard/TaskCard";
@@ -9,7 +9,7 @@ interface OpenTaskColumnProps {
   onOpenCreate: () => void;
   onCloseCreate: () => void;
   onCreateTask: (title: string) => void;
-  onTaskUpdate: (taskID: string, title: string, status: TaskStatus) => void;
+  onTaskUpdate: (task: Task) => void;
 }
 
 export default function OpenTaskColumn({
@@ -25,7 +25,9 @@ export default function OpenTaskColumn({
       <div className="relative flex items-center justify-center">
         <h2 className="mb-4 px-4 text-lg font-semibold">Open</h2>
         <button
-          className={cn("absolute right-0 mr-10 mb-4 text-lg font-bold")}
+          className={cn(
+            "absolute right-0 mr-10 mb-4 cursor-pointer text-lg font-bold",
+          )}
           onClick={isCreating ? onCloseCreate : onOpenCreate}
         >
           {!isCreating ? "new" : "hide"}

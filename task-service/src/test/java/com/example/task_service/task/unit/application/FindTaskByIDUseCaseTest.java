@@ -3,8 +3,6 @@ package com.example.task_service.task.unit.application;
 import com.example.task_service.task.application.FindTaskByIDUseCase;
 import com.example.task_service.task.domain.Task;
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskTitle;
-import com.example.task_service.task.domain.TaskStatus;
 import com.example.task_service.task.infrastructure.database.TaskRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,16 +29,12 @@ public class FindTaskByIDUseCaseTest {
     FindTaskByIDUseCase underTest;
 
     @Test
-    void shouldExecute() {
-        Task task1 = new Task(
-                TaskID.newTaskID(),
-                TaskTitle.newTaskTitle("feature"),
-                TaskStatus.newTaskStatus()
-        );
+    void shouldFindTaskByID() {
+        Task task = Task.create("feature", UUID.randomUUID());
 
-        when(repository.findByID(any())).thenReturn(Optional.of(task1));
+        when(repository.findByID(any())).thenReturn(Optional.of(task));
 
-        underTest.execute(task1.getId());
+        underTest.execute(task.getId());
 
         ArgumentCaptor<TaskID> taskCaptor = ArgumentCaptor.forClass(TaskID.class);
 
@@ -47,6 +42,6 @@ public class FindTaskByIDUseCaseTest {
 
         TaskID id = taskCaptor.getValue();
 
-        assertEquals(task1.getId().toString(), id.toString());
+        assertEquals(task.getId().toString(), id.toString());
     }
 }

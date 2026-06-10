@@ -1,27 +1,22 @@
 package com.example.task_service.task.unit.domain;
 
 import com.example.task_service.task.domain.Task;
-import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.TaskTitle;
-import com.example.task_service.task.domain.TaskStatus;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TaskTest {
 
     @Test
     void shouldCreateTask() {
-
-        TaskID id = TaskID.newTaskID();
-        TaskTitle title = TaskTitle.newTaskTitle("add feature");
-        TaskStatus status = TaskStatus.newTaskStatus();
-
-        Task task = new Task(id, title, status);
+        UUID projectID = UUID.randomUUID();
+        Task task = Task.create("add feature", projectID);
 
         assertEquals("add feature", task.getTitle().toString());
-        assertNotEquals("", task.getId().toString());
+        assertNotNull(task.getId());
     }
 
 }

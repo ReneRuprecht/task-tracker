@@ -1,7 +1,5 @@
 package com.example.task_service.task.domain;
 
-import com.example.task_service.task.domain.exception.InvalidTaskIDStringException;
-
 import java.util.UUID;
 
 public class TaskID {
@@ -18,14 +16,13 @@ public class TaskID {
         return new TaskID(id);
     }
 
-    public static TaskID fromString(String id) throws InvalidTaskIDStringException {
+    public static TaskID of(UUID id) {
 
-        try {
-            UUID uuid = UUID.fromString(id);
-            return new TaskID(uuid);
-        } catch (IllegalArgumentException ex) {
-            throw new InvalidTaskIDStringException();
-        }
+        return new TaskID(id);
+    }
+
+    public UUID id() {
+        return this.id;
     }
 
     public String toString() {

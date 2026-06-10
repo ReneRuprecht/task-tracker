@@ -5,9 +5,11 @@ import java.util.Optional;
 
 public interface RepositoryPort {
 
-    void save(Task task);
+    Task save(Task task);
 
     List<Task> findAll();
 
     Optional<Task> findByID(TaskID id);
+
+    List<Task> listTasksByProjectID(TaskProjectID projectID);
 }

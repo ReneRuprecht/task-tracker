@@ -1,7 +1,6 @@
 package com.example.task_service.task.unit.domain;
 
 import com.example.task_service.task.domain.TaskID;
-import com.example.task_service.task.domain.exception.InvalidTaskIDStringException;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -19,24 +18,13 @@ public class TaskIDTest {
     }
 
     @Test
-    void shouldCreateTaskIDFromString() {
+    void shouldCreateTaskIDFromUUID() {
 
         UUID id = UUID.randomUUID();
-        TaskID taskID = TaskID.fromString(id.toString());
+        TaskID taskID = TaskID.of(id);
 
-        assertNotEquals("", taskID.toString());
+        assertNotNull(taskID.id());
         assertEquals(id.toString(), taskID.toString());
     }
-    @Test
-    void shouldThrowInvalidArgumentExceptionFromInvalidString() {
 
-        Exception exception = assertThrows(
-                InvalidTaskIDStringException.class,()->{
-
-            TaskID.fromString("invalid");
-        });
-
-        assertEquals("Invalid UUID",exception.getMessage());
-
-    }
 }
