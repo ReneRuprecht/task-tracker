@@ -39,3 +39,8 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+
+  e2e:
+    needs: [backend-integration, test-frontend]
+    name: "E2E Test"
+    uses: ./.github/workflows/e2e.yml
