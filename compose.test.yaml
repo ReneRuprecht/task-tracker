@@ -55,7 +55,9 @@ services:
         condition: service_started
     working_dir: /e2e
     volumes:
-      - ./frontend:/e2e
+      - ./frontend/cypress:/e2e/cypress
+      - ./frontend/cypress.config.ts:/e2e/cypress.config.ts
+      - ./frontend/tsconfig.json:/e2e/tsconfig.json
     environment:
       CYPRESS_baseUrl: http://frontend:80
       CYPRESS_apiUrl: http://backend:8080
