@@ -24,7 +24,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/tasks")
-@CrossOrigin(origins = {"http://localhost:5173"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://frontend"})
 public class TaskController {
 
     private final CreateTaskUseCase createTaskUseCase;
