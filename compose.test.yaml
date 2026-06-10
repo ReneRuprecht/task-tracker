@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: tasktracker-db-test
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./task-service
+    container_name: tasktracker-backend-test
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_USERNAME: test
+      SPRING_DATASOURCE_PASSWORD: test
+      SPRING_PROFILES_ACTIVE: test
+      SPRING_COMPOSE_ENABLED: false
+      POSTGRES_HOST: db
+      POSTGRES_DB: test
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget","--spider", "-q", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://backend:8080
+    container_name: tasktracker-frontend-test
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:80"
+
+  cypress:
+    image: cypress/included:15.17.0
+    depends_on:
+      frontend:
+        condition: service_started
+    working_dir: /e2e
+    volumes:
+      - ./frontend:/e2e
+    environment:
+      CYPRESS_baseUrl: http://frontend:80
+      CYPRESS_apiUrl: http://backend:8080
+    entrypoint: ["cypress", "run"]
