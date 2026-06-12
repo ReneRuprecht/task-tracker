@@ -23,7 +23,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/projects")
-@CrossOrigin(origins = {"http://localhost:5173", "http://frontend"})
+@CrossOrigin(originPatterns = {"http://localhost:*", "http://frontend:*", "http://127.0.0.1:*", "http://172.*:*"})
 public class ProjectController {
 
     private final CreateProjectUseCase createProjectUseCase;

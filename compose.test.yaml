@@ -40,7 +40,7 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_BASE_URL: http://backend:8080
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
     container_name: tasktracker-frontend-test
     depends_on:
       backend:
@@ -48,17 +48,3 @@ services:
     ports:
       - "5173:80"
 
-  cypress:
-    image: cypress/included:15.17.0
-    depends_on:
-      frontend:
-        condition: service_started
-    working_dir: /e2e
-    volumes:
-      - ./frontend/cypress:/e2e/cypress
-      - ./frontend/cypress.config.ts:/e2e/cypress.config.ts
-      - ./frontend/tsconfig.json:/e2e/tsconfig.json
-    environment:
-      CYPRESS_baseUrl: http://frontend:80
-      CYPRESS_apiUrl: http://backend:8080
-    entrypoint: ["cypress", "run"]

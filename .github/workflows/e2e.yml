@@ -6,13 +6,35 @@ on:
 jobs:
   test:
     runs-on: self-hosted
+    container:
+      image: reneruprecht/ci-cypress:latest
     steps:
+      - name: Detect Docker host gateway
+        run: |
+          HOST_GATEWAY=$(ip route | awk '/default/ {print $3}')
+          echo "HOST_GATEWAY=$HOST_GATEWAY" >> $GITHUB_ENV
+
       - name: Checkout repo
         uses: actions/checkout@v6
 
       - name: Start docker + run E2E
+        env:
+          VITE_API_BASE_URL: http://${{ env.HOST_GATEWAY }}:8080
         run: |
-          docker compose -f compose.test.yaml up --build --abort-on-container-exit
+          docker compose -f compose.test.yaml build --quiet
+          docker compose -f compose.test.yaml up -d --wait
+
+      - name: Run NPM CI
+        working-directory: "frontend"
+        run: npm ci
+
+      - name: Run Cypress
+        working-directory: "frontend"
+        env:
+          CYPRESS_baseUrl: http://${{ env.HOST_GATEWAY }}:5173
+          CYPRESS_apiUrl: http://${{ env.HOST_GATEWAY }}:8080
+        run: |
+          npx cypress run
 
       - name: Show logs (on failure)
         if: failure()

@@ -24,7 +24,8 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/tasks")
-@CrossOrigin(origins = {"http://localhost:5173", "http://frontend"})
+@CrossOrigin(originPatterns = {"http://localhost:*", "http://frontend:*", "http://127.0.0.1:*", "http://172.*:*"})
+
 public class TaskController {
 
     private final CreateTaskUseCase createTaskUseCase;
@@ -35,8 +36,7 @@ public class TaskController {
     @PostMapping()
     public ResponseEntity<CreateTaskResponse> createTask(@RequestBody CreateTaskRequest createTaskRequest) {
 
-        CreateTaskCommand createTaskCommand = TaskMapper.toCreateTaskCommand(
-                createTaskRequest);
+        CreateTaskCommand createTaskCommand = TaskMapper.toCreateTaskCommand(createTaskRequest);
 
         Task task = this.createTaskUseCase.execute(createTaskCommand);
 
