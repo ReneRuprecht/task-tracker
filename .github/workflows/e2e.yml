@@ -40,6 +40,13 @@ jobs:
         if: failure()
         run: docker compose -f compose.test.yaml logs
 
+      - name: Upload Cypress Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots
+
       - name: Cleanup
         if: always()
         run: docker compose -f compose.test.yaml down -v
